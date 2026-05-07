@@ -1,0 +1,1824 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Vouch Coverage Intelligence — Prototype</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --vouch-dark: #0F1C2C;
+    --vouch-light: #F5F2EE;            /* warm cream (was #F7FAF2) */
+    --vouch-mint-cream: #F8FAF2;       /* pale mint cream — input fill, active row */
+    --vouch-mint-wash: #E8F5EF;        /* selected-section wash */
+    --vouch-plum: #3D2040;             /* Vouch plum — header avatar chip */
+    --vouch-dark-green: #1A5745;
+    --vouch-green: #3BE0AD;
+    --vouch-text-green: #19A078;
+    --vouch-yellow: #E8FC83;
+    --vouch-blue: #50EAF2;
+    --vouch-gray: #A8A8A8;
+    --vouch-light-gray: #E8E4DE;       /* warm tan border (was #EBEAE8) */
+    --tech-deep: #8F2A04;
+    --tech-mid: #CA6233;
+    --tech-light: #EDC2A2;
+    --hls-deep: #4A1F5C;
+    --hls-mid: #7A4FA5;
+    --hls-light: #D6C6E6;
+    --fs-deep: #1A3D75;
+    --fs-mid: #326CA3;
+    --fs-light: #C2D6EB;
+    --ps-deep: #B5851B;
+    --ps-mid: #E3A82B;
+    --ps-light: #F6D98A;
+  }
+  html, body { background: var(--vouch-light); color: var(--vouch-dark); font-family: 'Inter', Arial, Helvetica, sans-serif; }
+  .font-serif-brand { font-family: 'Fraunces', Georgia, serif; font-feature-settings: "ss01"; letter-spacing: -0.01em; }
+  .vouch-mesh {
+    background:
+      radial-gradient(circle at 18% 12%, rgba(59,224,173,.30) 0%, transparent 38%),
+      radial-gradient(circle at 88% 22%, rgba(80,234,242,.22) 0%, transparent 42%),
+      radial-gradient(circle at 65% 92%, rgba(232,252,131,.30) 0%, transparent 36%),
+      radial-gradient(circle at 12% 88%, rgba(26,87,69,.18) 0%, transparent 40%),
+      var(--vouch-light);
+  }
+  .vouch-mesh-dark {
+    background:
+      radial-gradient(circle at 22% 18%, rgba(59,224,173,.35) 0%, transparent 40%),
+      radial-gradient(circle at 82% 78%, rgba(80,234,242,.18) 0%, transparent 44%),
+      radial-gradient(circle at 60% 12%, rgba(232,252,131,.10) 0%, transparent 30%),
+      var(--vouch-dark);
+  }
+  .industry-tech { background: linear-gradient(135deg, var(--tech-light) 0%, transparent 60%); }
+  .industry-hls  { background: linear-gradient(135deg, var(--hls-light)  0%, transparent 60%); }
+  .industry-fs   { background: linear-gradient(135deg, var(--fs-light)   0%, transparent 60%); }
+  .industry-ps   { background: linear-gradient(135deg, var(--ps-light)   0%, transparent 60%); }
+  .pill {
+    display: inline-flex; align-items: center; gap: .5rem;
+    padding: .85rem 1.25rem; border-radius: 9999px;
+    border: 1.5px solid var(--vouch-dark); background: var(--vouch-light);
+    color: var(--vouch-dark); font-weight: 500; font-size: 0.95rem;
+    transition: all .15s ease;
+    cursor: pointer;
+  }
+  .pill:hover { background: var(--vouch-dark); color: var(--vouch-light); transform: translateY(-1px); }
+  .pill.selected { background: var(--vouch-dark); color: var(--vouch-light); }
+  .pill-chip {
+    padding: .65rem 1rem; border-radius: 9999px;
+    border: 1.5px solid var(--vouch-light-gray); background: var(--vouch-mint-cream);
+    font-size: 0.9rem; cursor: pointer; transition: all .15s ease;
+  }
+  .pill-chip:hover { border-color: var(--vouch-dark); }
+  .pill-chip.selected {
+    background: var(--vouch-dark); color: var(--vouch-light);
+    border-color: var(--vouch-dark);
+  }
+  .cta-primary {
+    background: var(--vouch-green); color: var(--vouch-dark);
+    padding: 1.1rem 2rem; border-radius: 9999px;
+    font-weight: 600; font-size: 1.05rem; cursor: pointer;
+    transition: all .15s ease; border: none;
+    box-shadow: 0 1px 0 rgba(15,28,44,0.06);
+  }
+  .cta-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(59,224,173,0.35); }
+  .cta-primary:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .cta-dark {
+    background: var(--vouch-dark); color: var(--vouch-light);
+    padding: 1.1rem 2rem; border-radius: 9999px;
+    font-weight: 600; font-size: 1.05rem; cursor: pointer; border: none;
+    transition: all .15s ease;
+  }
+  .cta-dark:hover { transform: translateY(-1px); }
+  .cta-link {
+    background: transparent; color: var(--vouch-dark);
+    padding: .65rem 1rem; border: none; cursor: pointer;
+    text-decoration: underline; font-size: .95rem;
+  }
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: .25rem .65rem; border-radius: 9999px;
+    font-size: .72rem; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .badge-required { background: var(--vouch-dark); color: var(--vouch-light); }
+  .badge-recommended { background: var(--vouch-green); color: var(--vouch-dark); }
+  .badge-optional { background: var(--vouch-light-gray); color: #555; }
+  .sublimit-chip {
+    display: inline-block; margin: .15rem;
+    padding: .2rem .55rem; border-radius: 6px;
+    font-size: .7rem; font-weight: 500;
+    background: #fff7d8; border: 1px solid #efe2a0; color: #6b5500;
+  }
+  .status-red { color: #B91C1C; }
+  .status-yellow { color: #B45309; }
+  .status-green { color: #15803D; }
+  .status-cell-red    { background: #FEE2E2; color: #991B1B; }
+  .status-cell-yellow { background: #FEF3C7; color: #92400E; }
+  .status-cell-green  { background: #D1FAE5; color: #065F46; }
+  .upload-zone {
+    border: 2px dashed var(--vouch-dark);
+    border-radius: 18px; padding: 3rem 2rem;
+    background: rgba(255,255,255,.6);
+    transition: all .2s ease;
+  }
+  .upload-zone.drag { background: rgba(59,224,173,.18); border-color: var(--vouch-text-green); }
+  .progress-rail { height: 4px; background: var(--vouch-light-gray); border-radius: 9999px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--vouch-dark); transition: width .3s ease; }
+  .why-link { font-size: .85rem; color: var(--vouch-text-green); text-decoration: underline; cursor: pointer; }
+  .why-box { font-size: .85rem; color: #555; padding: .65rem .9rem; background: rgba(80,234,242,.12); border-radius: 8px; margin-top: .5rem; }
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  .anim-fade { animation: fadeIn .35s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .anim-spin { animation: spinAround 1.4s linear infinite; }
+  @keyframes spinAround { to { transform: rotate(360deg); } }
+  .pulse-dot { animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
+  .card { background: #fff; border: 1px solid var(--vouch-light-gray); border-radius: 18px; padding: 1.5rem; }
+  .card-elevated { background: #fff; border: 1px solid var(--vouch-light-gray); border-radius: 22px; padding: 1.75rem; box-shadow: 0 1px 0 rgba(15,28,44,0.04); }
+  .input-base {
+    width: 100%; padding: .85rem 1rem; border: 1.5px solid var(--vouch-light-gray);
+    border-radius: 12px; font-size: .98rem; background: var(--vouch-mint-cream); color: var(--vouch-dark);
+    font-family: inherit;
+  }
+  .input-base:focus { outline: none; border-color: var(--vouch-dark); background: #fff; }
+  /* Card-stack form pattern (Q4 / Q6) — mhtml-derived */
+  .form-card {
+    background: #fff; border: 1px solid var(--vouch-light-gray);
+    border-radius: 12px; padding: 24px 28px; margin-bottom: 16px;
+  }
+  .form-card-title { font-weight: 600; font-size: 14px; color: #1a1a1a; margin-bottom: 12px; }
+  .form-card-help  { font-size: 13px; color: #6b7280; margin: 4px 0 12px; line-height: 1.5; }
+  .cta-primary-wide {
+    width: 100%; padding: 13px 0; border-radius: 8px; border: none;
+    background: var(--vouch-green); color: var(--vouch-dark);
+    font-weight: 600; font-size: 14px; cursor: pointer;
+    transition: filter .15s ease;
+  }
+  .cta-primary-wide:hover:not(:disabled) { filter: brightness(0.96); }
+  .cta-primary-wide:disabled { opacity: .45; cursor: not-allowed; }
+  /* Quiz sidebar checklist — mhtml-derived */
+  .quiz-sidebar {
+    width: 240px; flex-shrink: 0;
+    background: var(--vouch-mint-cream);
+    border-right: 1px solid var(--vouch-light-gray);
+    padding: 28px 0 32px;
+  }
+  .quiz-sidebar-progress {
+    padding: 0 24px 16px; border-bottom: 1px solid var(--vouch-light-gray); margin-bottom: 8px;
+  }
+  .quiz-sidebar-rail { height: 6px; background: #DDD8D0; border-radius: 99px; overflow: hidden; }
+  .quiz-sidebar-fill { height: 100%; background: var(--vouch-green); border-radius: 99px; transition: width .35s ease; }
+  .quiz-sidebar-item {
+    width: 100%; text-align: left; padding: 10px 24px;
+    border: none; background: transparent; cursor: pointer;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 14px; font-weight: 500; color: #3F4956;
+    transition: background .15s ease;
+  }
+  .quiz-sidebar-item:hover { background: var(--vouch-mint-wash); }
+  .quiz-sidebar-item.is-current { background: var(--vouch-mint-wash); font-weight: 600; }
+  .quiz-sidebar-item:disabled { cursor: not-allowed; opacity: .55; }
+  .quiz-sidebar-circle {
+    width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid #C4BDB4; background: transparent;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .quiz-sidebar-circle.is-done { background: #00A878; border-color: #00A878; }
+  .quiz-sidebar-circle.is-current { border-color: var(--vouch-text-green); }
+  /* Plum avatar chip — header right-side */
+  .plum-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--vouch-plum); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; letter-spacing: .02em;
+  }
+  .label { font-size: .8rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--vouch-dark); margin-bottom: .35rem; display: block; }
+  .scrollable { overflow-y: auto; max-height: 100vh; }
+  /* Yellow highlight for single-word emphasis in headlines */
+  .hl-yellow { background: var(--vouch-yellow); padding: 0 .25em; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-type="module" data-presets="env,react">
+const { useState, useMemo, useEffect, useRef } = React;
+
+// ============================================================
+//  BRAND + INDUSTRY MAP
+// ============================================================
+const INDUSTRY_KEYS = {
+  TECH: "Technology",
+  HLS: "Healthcare & Life Sciences",
+  FS: "Financial Services",
+  PS: "Professional Services",
+};
+const INDUSTRY_TONE = {
+  Technology: { className: "industry-tech", label: "Technology" },
+  "Healthcare & Life Sciences": { className: "industry-hls", label: "Healthcare & Life Sciences" },
+  "Financial Services": { className: "industry-fs", label: "Financial Services" },
+  "Professional Services": { className: "industry-ps", label: "Professional Services" },
+};
+
+// ============================================================
+//  Q1 / Q2 — INDUSTRY + SUB-VERTICAL OPTIONS
+// ============================================================
+const SUBVERTICALS = {
+  Technology: [
+    "AI", "SaaS", "DevTools", "Hardware", "eCommerce",
+    "Fintech — Lending", "Fintech — Payments / BaaS", "Fintech — RIA / Asset Mgmt",
+    "Insurtech", "Proptech", "Crypto / Web3", "Cybersecurity Services",
+  ],
+  "Healthcare & Life Sciences": [
+    "HealthTech",
+    "Life Sciences — Pre-clinical",
+    "Life Sciences — Phase 1–3",
+    "Life Sciences — Approved / Commercial",
+    "Medical Devices",
+  ],
+  "Financial Services": [
+    "Venture Capital", "Asset Management", "Hedge Funds", "RIA",
+  ],
+  "Professional Services": [
+    "AEC (Architecture, Engineering, Construction)",
+    "Accounting & Finance",
+    "Marketing, Design & Creative",
+    "Management Consulting",
+    "IT Consulting",
+    "Cybersecurity Consulting",
+  ],
+};
+
+// ============================================================
+//  Q3 — SIZE OPTIONS + D&O LIMIT TABLE
+// ============================================================
+const SIZE_OPTIONS_TECH = [
+  { key: "seed",   label: "Seed / Bootstrapped (<$5M)",      doLimit: "$1M" },
+  { key: "a",      label: "Series A ($5M–$25M raised)",       doLimit: "$2M" },
+  { key: "b",      label: "Series B ($25M–$50M)",             doLimit: "$3M" },
+  { key: "c",      label: "Series C ($50M–$250M)",            doLimit: "$5M" },
+  { key: "growth", label: "Growth ($250M+)",                  doLimit: "$5M (up to $10M)" },
+];
+const SIZE_OPTIONS_NONTECH = [
+  { key: "<1",   label: "<$1M",         doLimit: "$1M" },
+  { key: "1-5",  label: "$1M–$5M",      doLimit: "$1M" },
+  { key: "5-25", label: "$5M–$25M",     doLimit: "$2M" },
+  { key: "25-100", label: "$25M–$100M", doLimit: "$3M" },
+  { key: "100+", label: "$100M+",       doLimit: "$5M" },
+];
+
+// ============================================================
+//  Q4 — HEADCOUNT + WORKFORCE FLAGS
+// ============================================================
+const HEADCOUNT_OPTIONS = ["2–10", "11–50", "51–200", "200+"];
+const WORKFORCE_FLAGS = [
+  { key: "ca",  label: "Workforce concentrated in California" },
+  { key: "il",  label: "Workforce concentrated in Illinois, Texas, or Washington" },
+  { key: "ny",  label: "Workforce concentrated in New York" },
+  { key: "cust",label: "Customer-facing in person (retail / healthcare / hospitality / education / transportation)" },
+  { key: "bio", label: "Use fingerprint, palm, or face-scan timeclocks" },
+];
+
+// ============================================================
+//  Q5 — BUSINESS PROFILE FLAGS
+// ============================================================
+const PROFILE_FLAGS = [
+  { key: "enterprise", label: "Enterprise contracts ($100K+ deals)" },
+  { key: "smb",        label: "SMB or consumer customers" },
+  { key: "sensitive",  label: "Hold or process sensitive data — health records, cardholder data, or 10K+ consumer PII" },
+  { key: "funds",      label: "Hold client funds, escrow, or trust accounts" },
+  { key: "wires",      label: "Initiate wires or ACH at scale (regularly pay vendors, send domestic or international wires)" },
+  { key: "crypto",     label: "Hold cryptocurrency or digital assets" },
+  { key: "none",       label: "None of the above" },
+];
+
+// ============================================================
+//  Q6 — INDUSTRY-TAILORED TRIGGERS
+// ============================================================
+const TRIGGER_OPTIONS = {
+  Technology: [
+    { key: "fundraise", label: "Fundraise" },
+    { key: "ma",        label: "M&A / sale" },
+    { key: "rif",       label: "Layoff or RIF" },
+    { key: "token",     label: "Token launch / foundation setup" },
+    { key: "401k5",     label: "401(k) with $5M+ assets" },
+    { key: "selffunded",label: "Self-funded health plan" },
+    { key: "esop",      label: "ESOP / employer stock in 401(k)" },
+    { key: "none",      label: "None" },
+  ],
+  "Financial Services": [
+    { key: "newfund",   label: "New fund close or vintage" },
+    { key: "exam",      label: "SEC / FINRA / state regulatory exam" },
+    { key: "ma",        label: "M&A / sale" },
+    { key: "rif",       label: "Layoff or RIF" },
+    { key: "401k5",     label: "401(k) with $5M+ assets" },
+    { key: "selffunded",label: "Self-funded health plan" },
+    { key: "none",      label: "None" },
+  ],
+  "Professional Services": [
+    { key: "partner",   label: "New partner or major hire" },
+    { key: "bigcontract", label: "Large new contract win" },
+    { key: "ma",        label: "M&A / sale" },
+    { key: "rif",       label: "Layoff or RIF" },
+    { key: "401k5",     label: "401(k) with $5M+ assets" },
+    { key: "selffunded",label: "Self-funded health plan" },
+    { key: "none",      label: "None" },
+  ],
+  "Healthcare & Life Sciences": [
+    { key: "clinical",  label: "Clinical milestone or FDA submission" },
+    { key: "launch",    label: "Commercial launch" },
+    { key: "fundraise", label: "Fundraise" },
+    { key: "ma",        label: "M&A / sale" },
+    { key: "rif",       label: "Layoff or RIF" },
+    { key: "401k5",     label: "401(k) with $5M+ assets" },
+    { key: "selffunded",label: "Self-funded health plan" },
+    { key: "none",      label: "None" },
+  ],
+};
+
+// ============================================================
+//  COVERAGE MATRIX — base set per sub-vertical
+//  Each entry: { name, what, defaultPriority, limit, key }
+//  Q3-Q6 mutate via the snapshot engine.
+// ============================================================
+const REQ = "Required";
+const REC = "Strongly Recommended";
+const OPT = "Optional";
+const FROM_Q3 = "FROM_Q3";
+
+// reusable coverage definitions
+const COV = {
+  techEO: (limit, what) => ({ key: "techEO", name: "Tech E&O", what: what || "Covers claims that your software, platform, or technical service caused a customer financial loss.", defaultPriority: REQ, limit }),
+  cyber:  (limit, what) => ({ key: "cyber",  name: "Cyber Liability", what: what || "Pays for breach response, ransomware, regulatory penalties, and business interruption from a cyber event.", defaultPriority: REQ, limit }),
+  do:     ()           => ({ key: "do",     name: "Directors & Officers (D&O)", what: "Defends and indemnifies your board and executives for management decisions, financial disclosures, and investor disputes.", defaultPriority: FROM_Q3, limit: FROM_Q3 }),
+  gl:     (limit)      => ({ key: "gl",     name: "General Liability", what: "Covers third-party bodily injury, property damage, and personal injury arising from your operations.", defaultPriority: REC, limit }),
+  epli:   (limit)      => ({ key: "epli",   name: "Employment Practices Liability (EPLI)", what: "Covers wrongful termination, harassment, discrimination, and wage & hour claims from employees.", defaultPriority: REC, limit }),
+  crime:  (limit)      => ({ key: "crime",  name: "Crime", what: "Pays for losses from employee theft, social engineering, funds transfer fraud, and forgery.", defaultPriority: REC, limit }),
+  fid:    ()           => ({ key: "fid",    name: "Fiduciary Liability", what: "Defends sponsors and administrators of retirement and benefit plans against ERISA breach claims.", defaultPriority: OPT, limit: "$1M–$2M" }),
+  prodlia:(limit)      => ({ key: "prodlia",name: "Product Liability", what: "Covers bodily injury or property damage caused by a physical product you manufacture or sell.", defaultPriority: REQ, limit }),
+  prof:   (limit, what)=> ({ key: "prof",   name: "Professional Liability", what: what || "Covers claims that your professional advice or services caused a customer financial loss.", defaultPriority: REQ, limit }),
+  ia_eo:  (limit)      => ({ key: "ia_eo",  name: "Investment Advisor E&O", what: "Specialty E&O for RIA / fund management activity — claims tied to investment advice and discretionary trading.", defaultPriority: REQ, limit }),
+  lend:   (limit)      => ({ key: "lend",   name: "Lenders Liability", what: "Specialty E&O for lending activity — covers claims arising from loan origination, servicing, and collections.", defaultPriority: REQ, limit }),
+  ins_eo: (limit)      => ({ key: "ins_eo", name: "Insurance Services E&O", what: "Specialty E&O for MGA / agent activity — covers errors in placement, binding, or insurance advice.", defaultPriority: REQ, limit }),
+  re_eo:  (limit)      => ({ key: "re_eo",  name: "Real Estate Activities E&O", what: "Specialty E&O for real estate brokerage, property management, or holding tenant funds.", defaultPriority: REQ, limit }),
+  fid_im: (limit)      => ({ key: "fid_im", name: "Fiduciary Liability — Investment Management", what: "Covers the fiduciary duty owed to LPs and clients of an asset manager or RIA.", defaultPriority: REQ, limit }),
+  fid_erisa: (limit)   => ({ key: "fid_erisa", name: "Fiduciary Liability — ERISA Plans", what: "Covers fiduciary duty for the firm's own retirement and benefit plans (ERISA).", defaultPriority: REQ, limit }),
+  wc:     (limit)      => ({ key: "wc",     name: "Workers' Compensation", what: "Statutory employer coverage for workplace injury and illness.", defaultPriority: REQ, limit }),
+};
+
+// Per-sub-vertical base set
+const BASE_MATRIX = {
+  // ======= TECHNOLOGY =======
+  "AI":            [COV.techEO("$1M–$2M (CEM shared)"), COV.cyber("$1M–$2M (CEM shared)"), COV.do(), COV.gl("$1M"), COV.epli("$1M–$2M"), COV.crime("$1M"), COV.fid()],
+  "SaaS":          [COV.techEO("$1M–$2M (CEM shared)"), COV.cyber("$1M–$2M (CEM shared)"), COV.do(), COV.gl("$1M"), COV.epli("$1M–$2M"), COV.crime("$1M"), COV.fid()],
+  "DevTools":      [COV.techEO("$1M–$2M (CEM shared)"), COV.cyber("$1M–$2M (CEM shared)"), COV.do(), COV.gl("$1M"), COV.epli("$1M–$2M"), COV.crime("$1M"), COV.fid()],
+  "eCommerce":     [COV.techEO("$1M–$2M (CEM shared)"), COV.cyber("$1M–$2M (CEM shared)"), COV.do(), COV.gl("$1M"), COV.epli("$1M–$2M"), COV.crime("$1M"), COV.fid()],
+  "Hardware":      [COV.techEO("$1M–$2M (CEM shared)"), COV.cyber("$1M–$2M"), COV.do(), COV.gl("$2M"), COV.epli("$1M–$2M"), COV.prodlia("$2M–$5M"), COV.crime("$1M"), COV.fid()],
+  "Fintech — Lending":           [COV.techEO("$2M"), COV.cyber("$2M–$5M"), COV.do(), COV.gl("$1M"), COV.epli("$1M–$2M"), COV.crime("$1M–$2M"), COV.lend("$2M"), COV.fid()],
+  "Fintech — Payments / BaaS":   [COV.techEO("$2M"), COV.cyber("$2M–$5M"), COV.do(), COV.gl("$1M"), COV.epli("$1M–$2M"), COV.crime("$1M–$2M"), COV.fid()],
+  "Fintech — RIA / Asset Mgmt":  [COV.techEO("$2M"), COV.cyber("$2M–$5M"), COV.do(), COV.gl("$1M"), COV.epli("$1M–$2M"), COV.crime("$1M–$2M"), COV.ia_eo("$2M"), COV.fid()],
+  "Insurtech":     [COV.ins_eo("$2M"), COV.techEO("$1M–$2M (CEM shared)"), COV.cyber("$2M"), COV.do(), COV.gl("$1M"), COV.epli("$1M–$2M"), COV.crime("$1M"), COV.fid()],
+  "Proptech":      [COV.techEO("$1M–$2M (CEM shared)"), COV.cyber("$1M–$2M"), COV.do(), COV.gl("$1M"), COV.epli("$1M–$2M"), COV.re_eo("$2M"), COV.crime("$1M"), COV.fid()],
+  "Crypto / Web3": [COV.techEO("$2M"), COV.cyber("$2M"), COV.do(), COV.gl("$1M"), COV.epli("$1M–$2M"), COV.crime("$1M+"), COV.fid()],
+  "Cybersecurity Services": [COV.techEO("$2M", "Tech E&O for cybersecurity firms — must be free of \"failure to prevent a breach\" exclusion."), COV.cyber("$1M–$2M"), COV.prof("$2M", "Professional liability for vCISO / advisory services."), COV.do(), COV.gl("$1M"), COV.epli("$1M–$2M"), COV.crime("$1M"), COV.fid()],
+
+  // ======= HEALTHCARE & LIFE SCIENCES =======
+  "HealthTech": [COV.cyber("$2M–$5M"), COV.techEO("$2M"), COV.do(), COV.gl("$1M"), { ...COV.prof("$2M"), defaultPriority: REC }, COV.epli("$1M–$2M"), COV.crime("$1M"), COV.fid()],
+  "Life Sciences — Pre-clinical":         [COV.gl("$2M"), COV.do(), COV.cyber("$1M–$2M"), { ...COV.techEO("$1M–$2M"), defaultPriority: REC }, { ...COV.prof("$2M"), defaultPriority: REC }, COV.epli("$1M–$2M"), COV.crime("$1M")],
+  "Life Sciences — Phase 1–3":            [COV.gl("$2M"), COV.prodlia("$2M–$5M"), COV.do(), COV.cyber("$1M–$2M"), { ...COV.techEO("$1M–$2M"), defaultPriority: REC }, { ...COV.prof("$2M"), defaultPriority: REC }, COV.epli("$1M–$2M"), COV.crime("$1M")],
+  "Life Sciences — Approved / Commercial":[COV.gl("$2M"), COV.prodlia("$2M–$5M"), COV.do(), COV.cyber("$1M–$2M"), { ...COV.techEO("$1M–$2M"), defaultPriority: REC }, { ...COV.prof("$2M"), defaultPriority: REC }, COV.epli("$1M–$2M"), COV.crime("$1M")],
+  "Medical Devices":                      [COV.gl("$2M"), COV.prodlia("$2M–$5M"), COV.do(), COV.cyber("$1M–$2M"), { ...COV.techEO("$1M–$2M"), defaultPriority: REC }, { ...COV.prof("$2M"), defaultPriority: REC }, COV.epli("$1M–$2M"), COV.crime("$1M")],
+
+  // ======= FINANCIAL SERVICES =======
+  "Venture Capital":   [COV.do(), COV.fid_im("$2M–$5M"), COV.fid_erisa("$1M–$2M"), COV.ia_eo("$2M–$5M"), COV.crime("$1M–$3M"), COV.cyber("$1M–$2M"), COV.epli("$1M–$2M"), { ...COV.gl("$1M"), defaultPriority: REC }, { ...COV.techEO("$1M"), defaultPriority: OPT }],
+  "Asset Management":  [COV.do(), COV.fid_im("$2M–$5M"), COV.fid_erisa("$1M–$2M"), COV.ia_eo("$2M–$5M"), COV.crime("$1M–$3M"), COV.cyber("$1M–$2M"), COV.epli("$1M–$2M"), { ...COV.gl("$1M"), defaultPriority: REC }, { ...COV.techEO("$1M"), defaultPriority: OPT }],
+  "Hedge Funds":       [COV.do(), COV.fid_im("$2M–$5M"), COV.fid_erisa("$1M–$2M"), COV.ia_eo("$2M–$5M"), COV.crime("$1M–$3M"), COV.cyber("$1M–$2M"), COV.epli("$1M–$2M"), { ...COV.gl("$1M"), defaultPriority: REC }, { ...COV.techEO("$1M"), defaultPriority: OPT }],
+  "RIA":               [COV.do(), COV.fid_im("$2M–$5M"), COV.fid_erisa("$1M–$2M"), COV.ia_eo("$2M–$5M"), COV.crime("$1M–$3M"), COV.cyber("$1M–$2M"), COV.epli("$1M–$2M"), { ...COV.gl("$1M"), defaultPriority: REC }, { ...COV.techEO("$1M"), defaultPriority: OPT }],
+
+  // ======= PROFESSIONAL SERVICES =======
+  "AEC (Architecture, Engineering, Construction)": [COV.prof("$1M–$2M", "Professional E&O for architects, engineers, and contractors."), COV.gl("$1M–$2M"), COV.cyber("$1M"), COV.do(), COV.epli("$1M–$2M"), COV.wc("Statutory"), COV.crime("$500K")],
+  "IT Consulting":          [COV.prof("$1M–$2M", "Professional E&O for IT consulting and implementation services."), COV.gl("$1M–$2M"), COV.cyber("$1M"), COV.do(), COV.epli("$1M–$2M"), COV.crime("$500K")],
+  "Management Consulting":  [COV.prof("$1M–$2M", "Professional E&O for management consulting engagements."), COV.gl("$1M–$2M"), COV.cyber("$1M"), COV.do(), COV.epli("$1M–$2M"), COV.crime("$500K")],
+  "Accounting & Finance":   [COV.prof("$1M–$2M", "Professional E&O for CPAs, bookkeepers, and outsourced finance teams."), COV.gl("$1M"), COV.cyber("$1M"), COV.do(), COV.epli("$1M–$2M"), COV.crime("$500K–$1M")],
+  "Marketing, Design & Creative": [COV.prof("$1M–$2M", "Professional E&O for agencies and creative services — covers media, IP, and client deliverables."), COV.gl("$1M"), COV.cyber("$1M"), COV.do(), COV.epli("$1M–$2M"), COV.crime("$500K")],
+  "Cybersecurity Consulting": [COV.prof("$2M", "Professional liability for cybersecurity advisory work — vCISO, IR, audit."), { ...COV.techEO("$2M"), name: "Tech E&O", what: "Tech E&O for cybersecurity firms — must be free of \"failure to prevent a breach\" exclusion." }, COV.cyber("$1M–$2M"), COV.gl("$1M"), COV.do(), COV.epli("$1M–$2M"), COV.crime("$500K")],
+};
+
+// ============================================================
+//  D&O SIZING LOOKUP
+// ============================================================
+function getDoLimit(industry, sizeKey) {
+  if (industry === INDUSTRY_KEYS.TECH) {
+    const t = SIZE_OPTIONS_TECH.find(s => s.key === sizeKey);
+    return t ? t.doLimit : "$1M";
+  }
+  const n = SIZE_OPTIONS_NONTECH.find(s => s.key === sizeKey);
+  return n ? n.doLimit : "$1M";
+}
+function getSizeLabel(industry, sizeKey) {
+  const opts = industry === INDUSTRY_KEYS.TECH ? SIZE_OPTIONS_TECH : SIZE_OPTIONS_NONTECH;
+  const o = opts.find(s => s.key === sizeKey);
+  return o ? o.label : "";
+}
+function getSizeShortLabel(industry, sizeKey) {
+  if (industry === INDUSTRY_KEYS.TECH) {
+    const map = { seed: "Seed", a: "Series A", b: "Series B", c: "Series C", growth: "Growth" };
+    return map[sizeKey] || "";
+  }
+  const map = { "<1": "<$1M", "1-5": "$1M–$5M", "5-25": "$5M–$25M", "25-100": "$25M–$100M", "100+": "$100M+" };
+  return map[sizeKey] || "";
+}
+
+// ============================================================
+//  SNAPSHOT COMPUTATION ENGINE
+//  Implements the 7-step results computation logic from the PRD:
+//    1. Base coverage set for sub-vertical (Q2)
+//    2. D&O limit from Q3
+//    3. EPL endorsements from Q4
+//    4. Cyber/E&O/Crime priorities + sublimits from Q5 + Q2
+//    5. Fiduciary status from Q6 (plan triggers)
+//    6. Trigger-event flags from Q6 onto summary + sales brief
+//    7. Personalized "Why this applies to you" per coverage
+// ============================================================
+function computeSnapshot(a) {
+  const { industry, subVertical, size, headcount, workforceFlags, profileFlags, triggers } = a;
+  if (!industry || !subVertical || !size) return null;
+  const baseSet = (BASE_MATRIX[subVertical] || []).map(c => ({
+    ...c,
+    priority: c.defaultPriority,
+    limit: c.limit,
+    sublimits: [],
+    why: "",
+  }));
+  const doLimit = getDoLimit(industry, size);
+
+  const headcountIdx = HEADCOUNT_OPTIONS.indexOf(headcount);
+  const has11plus = headcountIdx >= 1;
+  const has51plus = headcountIdx >= 2;
+  const wf = new Set(workforceFlags || []);
+  const pf = new Set(profileFlags || []);
+  const tr = new Set(triggers || []);
+
+  const findCov = (key) => baseSet.find(c => c.key === key);
+  const promoteTo = (cov, level) => {
+    if (!cov) return;
+    const order = { [OPT]: 0, [REC]: 1, [REQ]: 2 };
+    if (order[level] > order[cov.priority]) cov.priority = level;
+  };
+
+  // Step 2 — D&O limit & priority from Q3
+  const doCov = findCov("do");
+  if (doCov) {
+    doCov.limit = doLimit;
+    if (doCov.priority === FROM_Q3) doCov.priority = REC;
+    if (industry === INDUSTRY_KEYS.FS) doCov.priority = REQ;
+    if (industry === INDUSTRY_KEYS.HLS) doCov.priority = REQ;
+    if (industry === INDUSTRY_KEYS.TECH) {
+      // Series A+ implies funded → D&O Required; Seed → Recommended
+      doCov.priority = (size === "seed") ? REC : REQ;
+    }
+    if (size === "seed" || size === "<1" || size === "1-5") {
+      // keep small but still flag
+      if (doCov.priority !== REQ) doCov.priority = REC;
+    }
+  }
+
+  // Step 3 — EPL endorsements from Q4
+  const epli = findCov("epli");
+  if (epli) {
+    if (has11plus) promoteTo(epli, REQ);
+    if (wf.has("ca")) epli.sublimits.push("Sublimit: Wage & hour defense — $250K");
+    if (wf.has("il") && wf.has("bio")) epli.sublimits.push("Endorsement: BIPA / biometric privacy");
+    else if (wf.has("bio")) epli.sublimits.push("Endorsement: Biometric privacy");
+    if (wf.has("cust")) epli.sublimits.push("Endorsement: Third-party discrimination");
+    if (wf.has("ny")) epli.sublimits.push("Note: NY State pay-equity / anti-harassment exposure");
+  }
+  // Workers' comp implication for 11+ / 51+
+  const hasWC = !!findCov("wc");
+  if (has11plus && !hasWC) {
+    baseSet.push({
+      ...COV.wc("Statutory"),
+      priority: has51plus ? REQ : REC,
+      sublimits: [],
+      why: "",
+    });
+  }
+
+  // Step 4 — Cyber / E&O / Crime priorities + sublimits from Q5 + Q2
+  const cyber = findCov("cyber");
+  const techEO = findCov("techEO");
+  const crime = findCov("crime");
+
+  if (pf.has("sensitive")) {
+    if (cyber) {
+      promoteTo(cyber, REQ);
+      cyber.limit = "$2M–$5M";
+      cyber.sublimits.push("Sublimit: PCI penalties");
+      cyber.sublimits.push("Sublimit: Privacy regulatory liability");
+      if (subVertical === "HealthTech" || industry === INDUSTRY_KEYS.HLS) {
+        cyber.sublimits.push("Sublimit: HIPAA penalty — $1M target");
+      }
+    }
+  }
+  if (pf.has("enterprise")) {
+    if (techEO) {
+      promoteTo(techEO, REQ);
+      techEO.sublimits.push("CEM shared-aggregate flag — separate-tower negotiation if contract requires $5M cyber + $5M E&O");
+    }
+  }
+  if (pf.has("funds")) {
+    if (crime) { promoteTo(crime, REQ); crime.sublimits.push("Coverage: Client property"); }
+  }
+  if (pf.has("wires")) {
+    if (crime) {
+      promoteTo(crime, REQ);
+      crime.sublimits.push("Recommend: Social engineering at full primary limit");
+      crime.sublimits.push("Recommend: Funds transfer fraud at full primary limit");
+    }
+  }
+  if (pf.has("crypto")) {
+    if (crime) {
+      promoteTo(crime, REQ);
+      crime.sublimits.push("Endorsement: Cryptocurrency / digital asset (default forms exclude)");
+    }
+  }
+
+  // AI sub-vertical → Tech E&O AI carve-back if sensitive data or enterprise
+  if (subVertical === "AI") {
+    if (techEO) {
+      techEO.sublimits.push("Carve-back: AI model output / hallucinations / training data");
+    }
+  }
+
+  // Step 5 — Fiduciary status from Q6 plan triggers
+  const fid = findCov("fid");
+  if (fid && (tr.has("401k5") || tr.has("selffunded") || tr.has("esop"))) {
+    fid.priority = REQ;
+    if (tr.has("selffunded")) fid.sublimits.push("Sublimit: HIPAA penalty — $1M target");
+    if (tr.has("esop")) fid.sublimits.push("Coverage: Employer-securities / ESOP");
+    if (tr.has("401k5")) fid.sublimits.push("Coverage: Excessive-fee litigation at full limit");
+  }
+
+  // Step 6 — Trigger-event flags surface on summary
+  const triggerNotes = [];
+  if (tr.has("fundraise")) {
+    if (doCov) {
+      promoteTo(doCov, REQ);
+      doCov.sublimits.push("Pre-negotiate: 6-year ERP at policy inception");
+    }
+    triggerNotes.push("fundraise");
+  }
+  if (tr.has("ma")) {
+    triggerNotes.push("M&A");
+    if (doCov) doCov.sublimits.push("Flag: Runoff / ERP for D&O / EPL / Fiduciary");
+  }
+  if (tr.has("rif")) {
+    triggerNotes.push("RIF");
+    if (epli) { promoteTo(epli, REQ); epli.sublimits.push("Flag: WARN Act exclusion scope review"); }
+  }
+  if (tr.has("token")) {
+    triggerNotes.push("token launch");
+    if (crime) crime.sublimits.push("Endorsement: Crypto / digital asset");
+  }
+  if (tr.has("exam")) {
+    triggerNotes.push("regulatory exam");
+    if (doCov) doCov.sublimits.push("Coverage: Regulatory defense scope");
+  }
+  if (tr.has("bigcontract")) {
+    triggerNotes.push("large contract win");
+    const profCov = findCov("prof");
+    if (profCov) profCov.sublimits.push("Recommend: E&O limit lift to $2M");
+  }
+  if (tr.has("clinical")) triggerNotes.push("clinical / FDA milestone");
+  if (tr.has("launch")) triggerNotes.push("commercial launch");
+
+  // Step 7 — Personalized "Why this applies to you"
+  baseSet.forEach(c => {
+    c.why = generateWhy(c, a);
+  });
+
+  // Header + summary
+  const header = formatHeader(industry, subVertical, size);
+  const summary = formatSummary(a, triggerNotes);
+
+  // Industry tone class
+  const tone = INDUSTRY_TONE[industry] || {};
+
+  return {
+    header,
+    summary,
+    coverages: baseSet.filter(c => c.priority !== FROM_Q3),
+    industryClass: tone.className || "",
+    industry,
+    subVertical,
+    triggerNotes,
+  };
+}
+
+function generateWhy(cov, a) {
+  const { industry, subVertical, size, profileFlags, headcount, triggers } = a;
+  const pf = new Set(profileFlags || []);
+  const tr = new Set(triggers || []);
+  switch (cov.key) {
+    case "techEO":
+      if (pf.has("enterprise")) return `Your enterprise contracts will require E&O at material limits — and likely a CEM separate-tower if buyers require $5M cyber + $5M E&O.`;
+      if (subVertical === "AI") return `AI products attract claims tied to model output, hallucinations, and training data — carve-back is non-negotiable.`;
+      return `Software platform exposure — covers customer financial loss tied to your tech.`;
+    case "cyber":
+      if (pf.has("sensitive") && industry === INDUSTRY_KEYS.HLS) return `PHI is the highest-cost data class — $60–$150 per record on a breach. HIPAA + BAA scope matters.`;
+      if (pf.has("sensitive")) return `You hold sensitive data; per-record breach costs and regulatory exposure justify higher limits and PCI / privacy sublimits.`;
+      return `Standard cyber exposure — breach response, ransomware, and BI lurk in every modern company.`;
+    case "do":
+      if (tr.has("fundraise")) return `You're raising — D&O is investor table-stakes, and a 6-year ERP should be pre-negotiated at this policy inception.`;
+      if (industry === INDUSTRY_KEYS.FS) return `LP / investor scrutiny and regulatory exposure make D&O foundational at your size.`;
+      return `Board, investor, and management decisions need defense and indemnification at this stage.`;
+    case "gl":
+      if (subVertical.startsWith("AEC")) return `Site work raises bodily-injury and property exposure — limit lift recommended.`;
+      return `Premises and operations exposure — required by most landlords and customer contracts.`;
+    case "epli":
+      if (tr.has("rif")) return `Layoffs trigger WARN Act and discrimination exposure — confirm the WARN Act exclusion scope.`;
+      if (headcount === "200+") return `At 200+ employees, EPL claim frequency steps up materially. Wage & hour defense is the biggest line item.`;
+      return `Employees mean EPL claims — wrongful termination, discrimination, harassment, and wage & hour.`;
+    case "crime":
+      if (pf.has("wires")) return `Wire and ACH activity puts social engineering and FTF in scope — at primary limit, not the default $250K sublimit.`;
+      if (pf.has("crypto")) return `Crypto/digital-asset losses are excluded by default. Endorsement is required.`;
+      if (pf.has("funds")) return `Holding client funds drives Crime to Required and adds client-property scope.`;
+      return `Treasury and AP activity make Crime exposure non-trivial — even small finance teams face FTF and BEC.`;
+    case "fid":
+      if (tr.has("selffunded")) return `Self-funded health plan adds HIPAA penalty exposure — sublimit to $1M.`;
+      if (tr.has("esop")) return `ESOP / employer stock in 401(k) raises Department of Labor scrutiny — needs employer-securities scope.`;
+      if (tr.has("401k5")) return `$5M+ in plan assets crosses the excessive-fee litigation threshold — coverage at full limit, not sublimited.`;
+      return `Sponsoring a retirement or benefit plan is fiduciary work — defense costs alone justify it.`;
+    case "fid_im":
+      return `You owe LPs and clients a fiduciary duty on the fund itself — separate from ERISA exposure on your own plans.`;
+    case "fid_erisa":
+      return `Your firm's own retirement and benefit plans need ERISA fiduciary coverage — distinct from the investment-management side.`;
+    case "ia_eo":
+      return `RIA / fund management activity attracts claims tied to investment advice — specialty E&O is required.`;
+    case "lend":
+      return `Lending activity attracts claims that primary E&O typically excludes — you need Lenders Liability.`;
+    case "ins_eo":
+      return `MGA / agent activity needs Insurance Services E&O — primary E&O carves it out.`;
+    case "re_eo":
+      return `Brokering / managing real estate or holding tenant funds requires Real Estate Activities E&O.`;
+    case "prodlia":
+      return `Physical product = product-liability exposure for bodily injury and property damage.`;
+    case "prof":
+      if (subVertical.includes("Cybersecurity")) return `vCISO / advisory work is professional services exposure — separate from Tech E&O.`;
+      if (industry === INDUSTRY_KEYS.PS) return `Your client deliverables and advice can result in financial loss claims — primary professional E&O is foundational.`;
+      return `Professional advice / patient-care activity attracts claims that GL and Tech E&O don't pick up.`;
+    case "wc":
+      return `Required by statute when you have employees — even one in most states.`;
+    default:
+      return "Recommended for this profile.";
+  }
+}
+
+function formatHeader(industry, subVertical, size) {
+  const sizeShort = getSizeShortLabel(industry, size);
+  if (industry === INDUSTRY_KEYS.TECH) return `${sizeShort} ${subVertical} Coverage Snapshot`;
+  if (industry === INDUSTRY_KEYS.FS)   return `${sizeShort} Revenue ${subVertical} Coverage Snapshot`;
+  if (industry === INDUSTRY_KEYS.PS)   return `${sizeShort} Revenue ${subVertical} Coverage Snapshot`;
+  if (industry === INDUSTRY_KEYS.HLS) {
+    if (subVertical === "HealthTech") return `${sizeShort} Revenue HealthTech Coverage Snapshot`;
+    return `${subVertical.replace("Life Sciences — ", "")} Coverage Snapshot`;
+  }
+  return `${subVertical} Coverage Snapshot`;
+}
+
+function formatSummary(a, triggerNotes) {
+  const { industry, subVertical, size, headcount, profileFlags } = a;
+  const sizeShort = getSizeShortLabel(industry, size);
+  const pf = new Set(profileFlags || []);
+  const profileBits = [];
+  if (pf.has("enterprise")) profileBits.push("enterprise contracts");
+  if (pf.has("smb")) profileBits.push("SMB / consumer customers");
+  if (pf.has("sensitive")) profileBits.push("handling sensitive data");
+  if (pf.has("funds")) profileBits.push("holding client funds");
+  if (pf.has("wires")) profileBits.push("running wires / ACH at scale");
+  if (pf.has("crypto")) profileBits.push("holding crypto");
+  const profileStr = profileBits.length ? `, ${profileBits.join(", ")}` : "";
+  const headcountStr = headcount ? `, ${headcount} employees` : "";
+
+  const baseLine = `Based on your profile — ${sizeShort} ${subVertical} company${headcountStr}${profileStr} — here are the coverages we recommend.`;
+
+  if (!triggerNotes.length) return baseLine;
+  const triggerLine = (() => {
+    if (triggerNotes.includes("fundraise")) return ` Your highest-leverage move right now is pre-negotiating a 6-year ERP on your D&O before the round closes.`;
+    if (triggerNotes.includes("M&A")) return ` Your M&A activity changes the runoff / ERP picture across D&O, EPL, and Fiduciary — flag these on the call.`;
+    if (triggerNotes.includes("RIF")) return ` Your upcoming layoff puts WARN Act exposure on EPL — make sure the exclusion scope is reviewed.`;
+    if (triggerNotes.includes("clinical / FDA milestone")) return ` Your clinical milestone shifts product-liability and clinical-trials coverage to top priority.`;
+    if (triggerNotes.includes("commercial launch")) return ` Your commercial launch elevates product liability and patient-care professional liability to the top of the stack.`;
+    if (triggerNotes.includes("regulatory exam")) return ` Your upcoming regulatory exam means the D&O regulatory-defense scope deserves a fresh read.`;
+    if (triggerNotes.includes("token launch")) return ` Your token / foundation launch needs coordinated D&O foundation-entity coverage with crime crypto endorsement.`;
+    return ` Your near-term events shape the priority list — we've flagged each on the snapshot.`;
+  })();
+  return baseLine + triggerLine;
+}
+
+// ============================================================
+//  PRE-CANNED DEMO SCORECARD (Path B)
+//  PRD-recommended "weak competitor" sample.
+// ============================================================
+const DEMO_SCORECARD = {
+  policyholder: "Sample Tech Co. — Series A SaaS",
+  carrier: "Competitor Carrier",
+  effective: "April 15, 2026 — April 15, 2027",
+  rows: [
+    {
+      coverage: "Cyber Liability",
+      limit: "$1M",
+      status: "red",
+      summary: "Limit too low for your profile; social engineering sublimited at $250K; ransomware sublimit $500K.",
+      sublimits: [
+        { label: "Social engineering: $250K", status: "red" },
+        { label: "Ransomware: $500K", status: "red" },
+        { label: "PCI sublimit: not present", status: "red" },
+        { label: "Wrongful collection / web-tracking carve-back: missing", status: "yellow" },
+      ],
+    },
+    {
+      coverage: "Tech E&O",
+      limit: "$2M (CEM shared)",
+      status: "yellow",
+      summary: "Adequate scope, but prior-and-pending litigation exclusion is present; AI carve-back missing.",
+      sublimits: [
+        { label: "Prior & pending litigation exclusion present", status: "red" },
+        { label: "AI carve-back missing", status: "red" },
+        { label: "CEM shared aggregate with Cyber + Media", status: "yellow" },
+      ],
+    },
+    {
+      coverage: "D&O",
+      limit: "$2M",
+      status: "yellow",
+      summary: "Limit OK at Series A but key carve-backs missing; hammer clause is 50/50.",
+      sublimits: [
+        { label: "Major shareholder exclusion threshold: 10% (red)", status: "red" },
+        { label: "Insured-vs-Insured: bankruptcy carve-back missing", status: "red" },
+        { label: "Hammer clause: 50/50", status: "red" },
+        { label: "Side A DIC: not present", status: "yellow" },
+        { label: "Conduct exclusion: 'allegation' (should be 'final adjudication')", status: "yellow" },
+      ],
+    },
+    {
+      coverage: "EPLI",
+      limit: "Not present",
+      status: "red",
+      summary: "No EPL coverage in current policy. With 35 employees in California, this is a glaring gap.",
+      sublimits: [
+        { label: "Wage & hour defense: missing", status: "red" },
+        { label: "Third-party discrimination: missing", status: "red" },
+        { label: "BIPA exclusion: n/a — coverage absent", status: "red" },
+      ],
+    },
+    {
+      coverage: "Fiduciary",
+      limit: "$1M",
+      status: "yellow",
+      summary: "Coverage in place but excessive-fee litigation is sublimited at $250K — material at $5M+ plan assets.",
+      sublimits: [
+        { label: "Excessive-fee sublimit: $250K", status: "red" },
+        { label: "HIPAA penalty sublimit: $100K", status: "red" },
+        { label: "Voluntary correction (VFCP) coverage: missing", status: "yellow" },
+      ],
+    },
+    {
+      coverage: "Crime",
+      limit: "$500K",
+      status: "yellow",
+      summary: "Loss-sustained form (vs. discovery) and social engineering sublimited at $100K.",
+      sublimits: [
+        { label: "Form: loss-sustained (should be discovery)", status: "red" },
+        { label: "Social engineering: $100K", status: "red" },
+        { label: "Funds transfer fraud: $250K", status: "yellow" },
+      ],
+    },
+    {
+      coverage: "General Liability",
+      limit: "$1M / $2M agg",
+      status: "green",
+      summary: "Standard limits, no material carve-outs identified.",
+      sublimits: [],
+    },
+  ],
+  topRisks: [
+    "EPL coverage is missing entirely — at 35 employees with a California concentration, a single wage & hour or harassment claim could exceed $500K in defense alone.",
+    "Cyber sublimits are all near the floor: social engineering at $250K, no PCI sublimit, missing wrongful-collection carve-back. A pixel-tracking class action would not be fully picked up.",
+    "D&O bankruptcy IvI carve-back is missing and the major-shareholder threshold sits at 10%. A down-round dispute or LP claim would have material defense gaps.",
+  ],
+  keyExclusions: [
+    "D&O insured-vs-insured exclusion lacks the bankruptcy trustee carve-back — a known Vouch CEM differentiator.",
+    "Tech E&O has a prior-and-pending litigation exclusion present (Vouch CEM does not).",
+    "Crime is on a loss-sustained form (not discovery) — a known Vouch differentiator on form-language.",
+    "AI carve-back missing on Tech E&O — material exposure for AI-touched product.",
+  ],
+  recommendedNextSteps: [
+    "Bind EPL ($1M–$2M) with wage & hour defense at $250K and third-party discrimination endorsement before next renewal cycle.",
+    "Increase Cyber primary to $2M, add PCI sublimit, negotiate wrongful-collection carve-back, and lift social engineering to full primary limit.",
+    "Re-mark D&O at renewal: bankruptcy IvI carve-back, hammer clause to 80/20 or no-cap, raise major-shareholder threshold to 25%.",
+  ],
+  talkingPoints: [
+    "Lead with the EPL gap — it's the single biggest controllable exposure for this account today and the easiest to bind quickly.",
+    "Use the social engineering sublimit story to walk into the broader 'sublimits don't cover modern losses' conversation. Vouch CEM at primary on these by default.",
+    "Frame the D&O carve-backs as 'form-language differentiators' — Vouch's policy reads better at the same price tier.",
+  ],
+};
+
+// ============================================================
+//  REUSABLE COMPONENTS
+// ============================================================
+function VouchHeader({ onReset, step, totalSteps, onBack, formData, hideProgress = false }) {
+  const initials =
+    formData?.firstName || formData?.lastName
+      ? `${(formData.firstName || "").charAt(0)}${(formData.lastName || "").charAt(0)}`.toUpperCase()
+      : "";
+  return (
+    <header className="w-full px-6 py-4 flex items-center justify-between border-b border-[var(--vouch-light-gray)] bg-white/60 backdrop-blur sticky top-0 z-10">
+      <div className="flex items-center gap-3 cursor-pointer" onClick={onReset}>
+        <div className="w-9 h-9 rounded-full bg-[#0F1C2C] text-[#3BE0AD] flex items-center justify-center font-serif-brand text-lg font-bold">V</div>
+        <div className="leading-tight">
+          <div className="font-serif-brand text-[1.05rem] font-semibold text-[#0F1C2C]">Vouch</div>
+          <div className="text-[.7rem] tracking-widest uppercase text-[#19A078] font-medium">Coverage Intelligence</div>
+        </div>
+      </div>
+      {!hideProgress && typeof step === "number" && totalSteps && (
+        <div className="hidden md:flex flex-1 mx-10 items-center gap-3">
+          <div className="text-xs uppercase tracking-widest text-[#A8A8A8]">Step {step} of {totalSteps}</div>
+          <div className="progress-rail flex-1">
+            <div className="progress-fill" style={{ width: `${(step/totalSteps)*100}%` }} />
+          </div>
+        </div>
+      )}
+      <div className="flex items-center gap-2">
+        {onBack && (
+          <button className="cta-link" onClick={onBack}>← Back</button>
+        )}
+        <button className="cta-link" onClick={onReset}>Start over</button>
+        {initials && <div className="plum-avatar ml-2" title={`${formData.firstName} ${formData.lastName}`.trim()}>{initials}</div>}
+      </div>
+    </header>
+  );
+}
+
+function QuestionShell({ children, title, eyebrow, why, onNext, onBack, nextLabel = "Continue", nextDisabled = false, cardStack = false }) {
+  const [showWhy, setShowWhy] = useState(false);
+  return (
+    <div className="anim-fade max-w-3xl mx-auto px-6 py-12 md:py-16">
+      {eyebrow && <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-4">{eyebrow}</div>}
+      <h2 className="font-serif-brand text-[2.1rem] md:text-[2.7rem] leading-[1.08] text-[#0F1C2C] font-semibold mb-3">
+        {title}
+      </h2>
+      {why && (
+        <div>
+          <button className="why-link" onClick={() => setShowWhy(s => !s)}>
+            {showWhy ? "Hide why" : "Why we ask"}
+          </button>
+          {showWhy && <div className="why-box anim-fade">{why}</div>}
+        </div>
+      )}
+      <div className="mt-8">{children}</div>
+      {cardStack ? (
+        <div className="mt-7 pt-5 border-t border-[var(--vouch-light-gray)]">
+          <button className="cta-primary-wide" onClick={onNext} disabled={nextDisabled}>
+            {nextLabel} →
+          </button>
+          <div className="mt-4 flex justify-start">
+            <button className="cta-link" onClick={onBack}>← Back</button>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-10 flex items-center justify-between gap-3">
+          <button className="cta-link" onClick={onBack}>← Back</button>
+          <button className="cta-primary" onClick={onNext} disabled={nextDisabled}>{nextLabel} →</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+//  LANDING / PATH SELECTOR
+//  Per Clark: upload is PRIMARY large CTA; quiz is SECONDARY smaller CTA.
+// ============================================================
+function Landing({ onPickUpload, onPickQuiz }) {
+  return (
+    <div className="vouch-mesh min-h-screen">
+      <div className="max-w-5xl mx-auto px-6 pt-16 md:pt-24 pb-20">
+        <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-5">
+          Vouch Coverage Intelligence
+        </div>
+        <h1 className="font-serif-brand text-[2.6rem] md:text-[4.1rem] leading-[1.02] font-semibold text-[#0F1C2C]">
+          See exactly where your insurance <span className="hl-yellow">falls short</span>.
+        </h1>
+        <p className="mt-6 max-w-2xl text-[1.1rem] md:text-[1.2rem] text-[#0F1C2C]/80 leading-snug">
+          Drop in your existing policy and we'll grade it line-by-line against Vouch's expert rubric — sublimits, exclusions, and form-language gaps your broker probably never mentioned. Most startups are underinsured at Series B because nobody told them what changed.
+        </p>
+
+        {/* PRIMARY large CTA — upload */}
+        <div className="mt-12 card-elevated p-8 md:p-10 max-w-3xl">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="text-xs px-2 py-0.5 rounded-full bg-[#0F1C2C] text-[#3BE0AD] font-semibold tracking-wider uppercase">Recommended</div>
+            <div className="text-xs px-2 py-0.5 rounded-full bg-[#E8FC83] text-[#0F1C2C] font-semibold tracking-wider uppercase">Most accurate</div>
+          </div>
+          <h2 className="font-serif-brand text-[1.85rem] md:text-[2.35rem] leading-tight font-semibold text-[#0F1C2C]">
+            Upload your existing policy
+          </h2>
+          <p className="mt-2 text-[1rem] md:text-[1.05rem] text-[#0F1C2C]/80 max-w-xl">
+            Get a full red / yellow / green scorecard graded against the same rubric our specialists use. PDF works. Takes about 90 seconds.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <button className="cta-primary text-[1.1rem]" onClick={onPickUpload}>
+              Upload my policy →
+            </button>
+            <span className="text-[.85rem] text-[#0F1C2C]/60">PDF · encrypted in transit · no obligation</span>
+          </div>
+        </div>
+
+        {/* SECONDARY smaller CTA — quiz */}
+        <div className="mt-8 max-w-3xl flex flex-col md:flex-row md:items-center md:justify-between gap-4 px-6 py-5 rounded-2xl border border-[#EBEAE8] bg-white/60">
+          <div>
+            <div className="text-xs tracking-widest uppercase text-[#A8A8A8] font-semibold">Don't have a policy yet?</div>
+            <h3 className="font-serif-brand text-[1.25rem] font-semibold text-[#0F1C2C] leading-tight">
+              Take the 2-minute coverage quiz
+            </h3>
+            <p className="text-[.9rem] text-[#0F1C2C]/70 max-w-md">
+              6 quick questions → personalized snapshot of what coverages and limits a company in your profile typically needs.
+            </p>
+          </div>
+          <button className="cta-dark whitespace-nowrap text-[.95rem]" onClick={onPickQuiz}>
+            Start the quiz →
+          </button>
+        </div>
+
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl text-[.85rem] text-[#0F1C2C]/70">
+          <div className="card-elevated">
+            <div className="font-semibold mb-1 text-[#0F1C2C]">6,000+ companies</div>
+            Insured by Vouch across Tech, Healthcare, Financial, and Professional Services.
+          </div>
+          <div className="card-elevated">
+            <div className="font-semibold mb-1 text-[#0F1C2C]">Form-language depth</div>
+            We grade what most brokers never read — exclusions, carve-backs, and sublimits.
+          </div>
+          <div className="card-elevated">
+            <div className="font-semibold mb-1 text-[#0F1C2C]">Specialist handoff</div>
+            Every result routes to a sub-vertical expert — not a generalist.
+          </div>
+        </div>
+        <div className="mt-12 text-[.7rem] text-[#A8A8A8] max-w-2xl">
+          This is informational and not a binding offer; final terms determined by underwriting. Ambition Insured.™
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+//  QUIZ — Q1 to Q6
+// ============================================================
+function Q1Industry({ value, onChange, onNext, onBack }) {
+  return (
+    <QuestionShell
+      eyebrow="Question 1 of 6"
+      title="What industry are you in?"
+      why="Industry decides which coverages are required by default and which sub-vertical sub-questions you'll see next."
+      onNext={onNext} onBack={onBack}
+      nextDisabled={!value}
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {Object.values(INDUSTRY_KEYS).map(i => (
+          <button key={i}
+            className={`pill justify-center text-left text-[1rem] py-5 ${value === i ? "selected" : ""}`}
+            onClick={() => onChange(i)}>
+            {i}
+          </button>
+        ))}
+      </div>
+    </QuestionShell>
+  );
+}
+
+function Q2SubVertical({ industry, value, onChange, onNext, onBack }) {
+  const options = SUBVERTICALS[industry] || [];
+  return (
+    <QuestionShell
+      eyebrow="Question 2 of 6"
+      title="Which best describes your company?"
+      why="Sub-vertical drives the base coverage matrix — and surfaces specialty E&O endorsements (Lending, Investment Advice, Real Estate, Insurance Services) inline so we don't have to ask separately."
+      onNext={onNext} onBack={onBack}
+      nextDisabled={!value}
+    >
+      <div className="flex flex-wrap gap-2">
+        {options.map(o => (
+          <button key={o}
+            className={`pill-chip ${value === o ? "selected" : ""}`}
+            onClick={() => onChange(o)}>
+            {o}
+          </button>
+        ))}
+      </div>
+    </QuestionShell>
+  );
+}
+
+function Q3Size({ industry, value, onChange, onNext, onBack }) {
+  const isTech = industry === INDUSTRY_KEYS.TECH;
+  const opts = isTech ? SIZE_OPTIONS_TECH : SIZE_OPTIONS_NONTECH;
+  const title = isTech ? "What's your funding stage?" : "What's your annual revenue?";
+  return (
+    <QuestionShell
+      eyebrow="Question 3 of 6"
+      title={title}
+      why="Capital raised (Tech) or annual revenue (everyone else) is the primary D&O sizing variable. We'll surface a recommended D&O limit on the snapshot."
+      onNext={onNext} onBack={onBack}
+      nextDisabled={!value}
+    >
+      <div className="flex flex-wrap gap-2">
+        {opts.map(o => (
+          <button key={o.key}
+            className={`pill ${value === o.key ? "selected" : ""}`}
+            onClick={() => onChange(o.key)}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </QuestionShell>
+  );
+}
+
+function Q4People({ headcount, workforceFlags, onChangeHeadcount, onToggleFlag, onNext, onBack }) {
+  return (
+    <QuestionShell
+      eyebrow="Question 4 of 6"
+      title="Tell us about your team."
+      why="Headcount drives EPL and Workers' Comp. Geographic concentration (CA, IL/TX/WA, NY) and customer-facing exposure trigger specific endorsements like wage & hour defense, BIPA, and third-party discrimination."
+      onNext={onNext} onBack={onBack}
+      nextDisabled={!headcount}
+      nextLabel="Save & continue"
+      cardStack={true}
+    >
+      <div className="form-card">
+        <div className="form-card-title">Headcount</div>
+        <div className="flex flex-wrap gap-2">
+          {HEADCOUNT_OPTIONS.map(h => (
+            <button key={h}
+              className={`pill ${headcount === h ? "selected" : ""}`}
+              onClick={() => onChangeHeadcount(h)}>
+              {h}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="form-card">
+        <div className="form-card-title">
+          What applies?
+          <span className="font-normal text-[#9CA3AF] text-[13px]"> (optional)</span>
+        </div>
+        <div className="form-card-help">Select any that apply. These trigger specific endorsements like wage & hour defense, BIPA, and third-party discrimination.</div>
+        <div className="flex flex-wrap gap-2">
+          {WORKFORCE_FLAGS.map(f => (
+            <button key={f.key}
+              className={`pill-chip ${workforceFlags.includes(f.key) ? "selected" : ""}`}
+              onClick={() => onToggleFlag(f.key)}>
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </QuestionShell>
+  );
+}
+
+function Q5Profile({ values, onToggle, onNext, onBack }) {
+  return (
+    <QuestionShell
+      eyebrow="Question 5 of 6"
+      title="Which of these describe your business?"
+      why="These flags drive Cyber, E&O, and Crime priorities and limits — and set up the sublimit and endorsement chips on your snapshot."
+      onNext={onNext} onBack={onBack}
+      nextDisabled={!values.length}
+    >
+      <div className="text-[.85rem] text-[#0F1C2C]/60 mb-3">Select all that apply.</div>
+      <div className="flex flex-wrap gap-2">
+        {PROFILE_FLAGS.map(f => (
+          <button key={f.key}
+            className={`pill-chip ${values.includes(f.key) ? "selected" : ""}`}
+            onClick={() => onToggle(f.key)}>
+            {f.label}
+          </button>
+        ))}
+      </div>
+    </QuestionShell>
+  );
+}
+
+function Q6Triggers({ industry, values, onToggle, onNext, onBack }) {
+  const opts = TRIGGER_OPTIONS[industry] || TRIGGER_OPTIONS.Technology;
+  return (
+    <QuestionShell
+      eyebrow="Question 6 of 6"
+      title="Anything coming up in the next 12 months?"
+      why="Trigger events change priority and limit recommendations — fundraises bump D&O and pre-negotiate ERP, M&A flags runoff, layoffs trigger WARN Act review, and plan-asset milestones move Fiduciary to Required."
+      onNext={onNext} onBack={onBack}
+      nextLabel="See my snapshot"
+      nextDisabled={!values.length}
+      cardStack={true}
+    >
+      <div className="form-card">
+        <div className="form-card-title">
+          Trigger events
+          <span className="font-normal text-[#9CA3AF] text-[13px]"> (select all that apply)</span>
+        </div>
+        <div className="form-card-help">Fundraises, M&amp;A, layoffs, regulatory exams, and plan-asset milestones each change which coverages we recommend and at what limit.</div>
+        <div className="flex flex-wrap gap-2">
+          {opts.map(o => (
+            <button key={o.key}
+              className={`pill-chip ${values.includes(o.key) ? "selected" : ""}`}
+              onClick={() => onToggle(o.key)}>
+              {o.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </QuestionShell>
+  );
+}
+
+// ============================================================
+//  HUBSPOT FORM GATE (mocked)
+// ============================================================
+function HubSpotGate({ onSubmit, onBack, ctx }) {
+  const [form, setForm] = useState({
+    firstName: "", lastName: "", email: "", company: "", role: "", phone: "", consent: false,
+  });
+  const [touched, setTouched] = useState(false);
+  const valid =
+    form.firstName.trim() &&
+    form.lastName.trim() &&
+    /\S+@\S+\.\S+/.test(form.email) &&
+    form.company.trim() &&
+    form.role.trim() &&
+    form.consent;
+
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const headline =
+    ctx === "B"
+      ? "Almost there. Tell us where to send your full policy analysis."
+      : "Your coverage snapshot is ready. Tell us where to send it.";
+  const subhead =
+    ctx === "B"
+      ? "We'll email a copy and route your scorecard to a sub-vertical specialist."
+      : "We'll email a copy of your snapshot and unlock the full results below.";
+
+  return (
+    <div className="vouch-mesh min-h-screen">
+      <div className="max-w-2xl mx-auto px-6 py-12 md:py-20 anim-fade">
+        <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-4">
+          Almost there
+        </div>
+        <h2 className="font-serif-brand text-[2rem] md:text-[2.6rem] leading-tight font-semibold text-[#0F1C2C]">
+          {headline}
+        </h2>
+        <p className="mt-3 text-[1.02rem] text-[#0F1C2C]/70">{subhead}</p>
+
+        <div className="card-elevated mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="label">First name *</label>
+              <input className="input-base" value={form.firstName} onChange={e => set("firstName", e.target.value)} />
+            </div>
+            <div>
+              <label className="label">Last name *</label>
+              <input className="input-base" value={form.lastName} onChange={e => set("lastName", e.target.value)} />
+            </div>
+            <div className="md:col-span-2">
+              <label className="label">Work email *</label>
+              <input type="email" className="input-base" value={form.email} onChange={e => set("email", e.target.value)} />
+            </div>
+            <div>
+              <label className="label">Company *</label>
+              <input className="input-base" value={form.company} onChange={e => set("company", e.target.value)} />
+            </div>
+            <div>
+              <label className="label">Role / title *</label>
+              <input className="input-base" value={form.role} onChange={e => set("role", e.target.value)} />
+            </div>
+            <div className="md:col-span-2">
+              <label className="label">Phone <span className="text-[#A8A8A8] font-normal normal-case tracking-normal">(optional)</span></label>
+              <input className="input-base" value={form.phone} onChange={e => set("phone", e.target.value)} />
+            </div>
+            <label className="md:col-span-2 flex items-start gap-3 mt-2 cursor-pointer">
+              <input type="checkbox" className="mt-1.5 w-4 h-4 accent-[#0F1C2C]" checked={form.consent} onChange={e => set("consent", e.target.checked)} />
+              <span className="text-[.85rem] text-[#0F1C2C]/80">
+                I agree to receive my results plus occasional Vouch updates. You can unsubscribe any time. We comply with CAN-SPAM, GDPR, and CCPA.
+              </span>
+            </label>
+          </div>
+          {touched && !valid && (
+            <div className="mt-4 text-sm text-[#B91C1C]">Please fill in all required fields and accept the consent checkbox.</div>
+          )}
+          <div className="mt-7 flex items-center justify-between gap-3">
+            <button className="cta-link" onClick={onBack}>← Back</button>
+            <button className="cta-primary" onClick={() => { setTouched(true); if (valid) onSubmit(form); }}>
+              Unlock my results →
+            </button>
+          </div>
+        </div>
+        <div className="mt-6 text-[.7rem] text-[#A8A8A8]">
+          Prototype: form is mocked — no real HubSpot or Salesforce write happens here.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+//  PATH A SUCCESS PAGE — Snapshot
+//  Industry-tailored header, personalized summary, coverage cards.
+//  Primary CTA = upload (Path A → B handoff).
+// ============================================================
+function PriorityBadge({ p }) {
+  if (p === REQ) return <span className="badge badge-required">Required</span>;
+  if (p === REC) return <span className="badge badge-recommended">Strongly Recommended</span>;
+  return <span className="badge badge-optional">Optional</span>;
+}
+
+function CoverageCard({ cov }) {
+  return (
+    <div className="card flex flex-col gap-3 h-full">
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="font-serif-brand text-[1.35rem] leading-tight font-semibold text-[#0F1C2C] underline decoration-[#3BE0AD] decoration-2 underline-offset-4">
+          {cov.name}
+        </h3>
+        <PriorityBadge p={cov.priority} />
+      </div>
+      <div className="text-[.92rem] text-[#0F1C2C]/80">{cov.what}</div>
+      {cov.why && (
+        <div className="text-[.92rem] text-[#0F1C2C]">
+          <span className="font-semibold">Why this applies to you: </span>{cov.why}
+        </div>
+      )}
+      <div className="mt-auto pt-3 border-t border-[#EBEAE8] flex items-baseline justify-between">
+        <div className="text-xs uppercase tracking-widest text-[#A8A8A8]">Recommended limit</div>
+        <div className="font-serif-brand text-[1.6rem] font-semibold text-[#0F1C2C]">{cov.limit}</div>
+      </div>
+      {cov.sublimits && cov.sublimits.length > 0 && (
+        <div className="-mt-2">
+          {cov.sublimits.map((s, i) => (
+            <span key={i} className="sublimit-chip">{s}</span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SnapshotPage({ snapshot, answers, formData, onUpload, onCalendly, onResend, onReset }) {
+  if (!snapshot) return null;
+  const { header, summary, coverages, industryClass } = snapshot;
+  return (
+    <div className="vouch-mesh min-h-screen">
+      <VouchHeader onReset={onReset} formData={formData} />
+      <div className={`anim-fade ${industryClass}`}>
+        <div className="max-w-6xl mx-auto px-6 pt-10 md:pt-16 pb-6">
+          <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-3">
+            Your snapshot — {formData?.firstName ? `for ${formData.firstName}, ${formData.company}` : "personalized"}
+          </div>
+          <h1 className="font-serif-brand text-[2.2rem] md:text-[3.1rem] leading-[1.04] font-semibold text-[#0F1C2C]">
+            {header}
+          </h1>
+          <p className="mt-5 text-[1.02rem] md:text-[1.1rem] text-[#0F1C2C]/85 max-w-3xl">
+            {summary}
+          </p>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {coverages.map((c, i) => (
+            <CoverageCard key={c.key + i} cov={c} />
+          ))}
+        </div>
+
+        {/* Path A → B handoff (PRIMARY CTA) */}
+        <div className="mt-12 card-elevated bg-[#0F1C2C] text-[#F7FAF2] p-8 md:p-10 vouch-mesh-dark">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+            <div className="max-w-xl">
+              <div className="text-xs tracking-widest uppercase text-[#3BE0AD] font-semibold mb-2">
+                Want the full analysis?
+              </div>
+              <h2 className="font-serif-brand text-[1.7rem] md:text-[2.1rem] font-semibold leading-tight">
+                Upload your existing policy and we'll grade every line.
+              </h2>
+              <p className="mt-2 text-[#F7FAF2]/80 text-[.98rem]">
+                Sublimits, exclusions, form-language gaps, and the specific things to negotiate at renewal — graded against the same rubric our specialists use.
+              </p>
+            </div>
+            <button className="cta-primary text-[1.05rem] whitespace-nowrap" onClick={onUpload}>
+              Upload my policy →
+            </button>
+          </div>
+        </div>
+
+        {/* Secondary CTAs */}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-[.95rem]">
+          <div className="flex flex-wrap gap-3">
+            <button className="cta-dark text-[.92rem] py-3 px-5" onClick={onCalendly}>
+              Book a 15-min call instead
+            </button>
+            <button className="cta-link" onClick={onResend}>
+              Email me this snapshot
+            </button>
+          </div>
+          <div className="text-[.7rem] text-[#A8A8A8] max-w-md text-right">
+            Sublimits, exclusions, and form-language are graded only when you upload your policy in Path B.
+          </div>
+        </div>
+
+        <div className="mt-10 text-[.7rem] text-[#A8A8A8] max-w-2xl">
+          This is informational and not a binding offer; final terms determined by underwriting. Ambition Insured.™
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+//  PATH B — UPLOAD
+// ============================================================
+function UploadScreen({ onUploaded, onBack, onReset, formData }) {
+  const [drag, setDrag] = useState(false);
+  const [filename, setFilename] = useState("");
+  const fileRef = useRef(null);
+
+  const accept = (file) => {
+    if (!file) return;
+    setFilename(file.name);
+    setTimeout(() => onUploaded(file.name), 600);
+  };
+
+  return (
+    <div className="vouch-mesh min-h-screen">
+      <VouchHeader onReset={onReset} formData={formData} />
+      <div className="max-w-3xl mx-auto px-6 py-12 md:py-16 anim-fade">
+        <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-4">
+          Step 2 of 2 — upload your policy
+        </div>
+        <h2 className="font-serif-brand text-[2.1rem] md:text-[2.7rem] leading-tight font-semibold text-[#0F1C2C]">
+          Drop your current policy.
+        </h2>
+        <p className="mt-3 text-[1.02rem] text-[#0F1C2C]/75 max-w-xl">
+          PDF works best. We'll grade each line against Vouch's rubric — sublimits, exclusions, and form-language gaps your broker probably never read out loud.
+        </p>
+
+        <div
+          className={`upload-zone mt-8 text-center cursor-pointer ${drag ? "drag" : ""}`}
+          onDragOver={e => { e.preventDefault(); setDrag(true); }}
+          onDragLeave={() => setDrag(false)}
+          onDrop={e => {
+            e.preventDefault(); setDrag(false);
+            const f = e.dataTransfer.files?.[0]; if (f) accept(f);
+          }}
+          onClick={() => fileRef.current?.click()}
+        >
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/pdf,image/*"
+            className="hidden"
+            onChange={e => accept(e.target.files?.[0])}
+          />
+          <div className="font-serif-brand text-[1.3rem] font-semibold text-[#0F1C2C]">
+            {filename ? `Uploaded: ${filename}` : "Drop your policy here"}
+          </div>
+          <div className="mt-1 text-[.9rem] text-[#0F1C2C]/70">
+            or click to choose a file · PDF or image · max ~25MB
+          </div>
+          <div className="mt-5">
+            <span className="cta-primary inline-block">Choose file</span>
+          </div>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 text-[.85rem]">
+          <div className="card-elevated">
+            <div className="font-semibold mb-1">Encrypted in transit</div>
+            <div className="text-[#0F1C2C]/70">PII and beneficial-owner info stay private.</div>
+          </div>
+          <div className="card-elevated">
+            <div className="font-semibold mb-1">No obligation</div>
+            <div className="text-[#0F1C2C]/70">A scorecard, not a quote. Switching brokers is your call.</div>
+          </div>
+          <div className="card-elevated">
+            <div className="font-semibold mb-1">Specialist review</div>
+            <div className="text-[#0F1C2C]/70">Routed to a sub-vertical expert — not a generalist.</div>
+          </div>
+        </div>
+
+        <div className="mt-10 flex items-center justify-between">
+          <button className="cta-link" onClick={onBack}>← Back</button>
+          <div className="text-[.7rem] text-[#A8A8A8] max-w-sm text-right">
+            Prototype: filename is captured but the file isn't actually parsed. The scorecard is pre-canned demo data.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+//  PATH B — PROCESSING
+// ============================================================
+function ProcessingScreen({ onDone, filename }) {
+  const [tick, setTick] = useState(0);
+  const phases = [
+    "Parsing policy declarations…",
+    "Extracting limits, sublimits, and endorsement schedule…",
+    "Reading exclusions and form-language carve-backs…",
+    "Grading against Vouch's coverage rubric…",
+    "Compiling red / yellow / green scorecard…",
+  ];
+  useEffect(() => {
+    if (tick >= phases.length) { onDone(); return; }
+    const t = setTimeout(() => setTick(tick + 1), 1400);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line
+  }, [tick]);
+
+  return (
+    <div className="vouch-mesh min-h-screen">
+      <div className="max-w-2xl mx-auto px-6 py-24 anim-fade text-center">
+        <div className="inline-block w-14 h-14 rounded-full border-4 border-[#3BE0AD] border-t-transparent anim-spin" />
+        <h2 className="mt-8 font-serif-brand text-[2rem] md:text-[2.5rem] leading-tight font-semibold text-[#0F1C2C]">
+          Analyzing your policy…
+        </h2>
+        {filename && (
+          <div className="mt-2 text-[.9rem] text-[#0F1C2C]/70">{filename}</div>
+        )}
+        <div className="mt-8 max-w-md mx-auto">
+          {phases.map((p, i) => (
+            <div key={i}
+              className={`flex items-center gap-3 py-2 transition-opacity ${i < tick ? "opacity-100" : i === tick ? "opacity-80" : "opacity-30"}`}>
+              <span className={`w-2 h-2 rounded-full ${i < tick ? "bg-[#19A078]" : i === tick ? "bg-[#3BE0AD] pulse-dot" : "bg-[#A8A8A8]"}`} />
+              <span className="text-[.95rem] text-[#0F1C2C]">{p}</span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-10 text-[.75rem] text-[#A8A8A8]">
+          Average analysis time is 60–90 seconds. We'll email you the scorecard when it's ready.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+//  PATH B — SCORECARD
+// ============================================================
+function StatusDot({ status }) {
+  const map = { red: "🔴", yellow: "🟡", green: "🟢" };
+  return <span className="mr-1.5">{map[status] || "•"}</span>;
+}
+function statusClass(status) {
+  if (status === "red") return "status-cell-red";
+  if (status === "yellow") return "status-cell-yellow";
+  if (status === "green") return "status-cell-green";
+  return "";
+}
+
+function ScorecardPage({ data, formData, onCalendly, onReset }) {
+  const counts = data.rows.reduce((acc, r) => { acc[r.status] = (acc[r.status] || 0) + 1; return acc; }, { red: 0, yellow: 0, green: 0 });
+  return (
+    <div className="vouch-mesh min-h-screen">
+      <VouchHeader onReset={onReset} formData={formData} />
+      <div className="max-w-6xl mx-auto px-6 pt-10 md:pt-14 pb-12 anim-fade">
+        <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-3">
+          Policy Analysis — {formData?.firstName ? `for ${formData.firstName}, ${formData.company}` : "your policy"}
+        </div>
+        <h1 className="font-serif-brand text-[2.2rem] md:text-[3rem] leading-[1.04] font-semibold text-[#0F1C2C]">
+          Your policy, <span className="hl-yellow">graded</span>.
+        </h1>
+        <p className="mt-3 text-[1.02rem] text-[#0F1C2C]/80 max-w-3xl">
+          We reviewed <span className="font-semibold">{data.policyholder}</span> ({data.carrier}, {data.effective}) against Vouch's coverage rubric. Here's what we found — line by line.
+        </p>
+
+        <div className="mt-8 flex flex-wrap gap-3">
+          <div className={`px-4 py-3 rounded-xl ${statusClass("red")} font-semibold`}>{counts.red || 0} red — material gaps</div>
+          <div className={`px-4 py-3 rounded-xl ${statusClass("yellow")} font-semibold`}>{counts.yellow || 0} yellow — needs attention</div>
+          <div className={`px-4 py-3 rounded-xl ${statusClass("green")} font-semibold`}>{counts.green || 0} green — adequate</div>
+        </div>
+
+        {/* Scorecard table */}
+        <div className="mt-8 card-elevated p-0 overflow-hidden">
+          <div className="grid grid-cols-12 px-5 py-3 bg-[#0F1C2C] text-[#F7FAF2] text-[.78rem] uppercase tracking-widest font-semibold">
+            <div className="col-span-3">Coverage</div>
+            <div className="col-span-2">Limit</div>
+            <div className="col-span-1 text-center">Status</div>
+            <div className="col-span-6">What we found</div>
+          </div>
+          {data.rows.map((r, idx) => (
+            <div key={idx} className="grid grid-cols-12 px-5 py-5 border-t border-[#EBEAE8] items-start gap-3">
+              <div className="col-span-3 font-serif-brand text-[1.15rem] font-semibold text-[#0F1C2C]">{r.coverage}</div>
+              <div className="col-span-2 text-[.95rem] text-[#0F1C2C]/80">{r.limit}</div>
+              <div className="col-span-1 text-center">
+                <span className={`inline-block px-3 py-1 rounded-full text-[.75rem] font-bold uppercase ${statusClass(r.status)}`}>
+                  {r.status}
+                </span>
+              </div>
+              <div className="col-span-6">
+                <div className="text-[.95rem] text-[#0F1C2C]">{r.summary}</div>
+                {r.sublimits.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {r.sublimits.map((s, i) => (
+                      <span key={i} className={`px-2 py-1 rounded-md text-[.72rem] font-medium ${statusClass(s.status)}`}>
+                        <StatusDot status={s.status}/>{s.label}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Top risks */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-10">
+          <div className="card-elevated">
+            <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-3">Top 3 risks</div>
+            <ol className="list-decimal pl-5 space-y-2 text-[.95rem] text-[#0F1C2C]">
+              {data.topRisks.map((r, i) => <li key={i}>{r}</li>)}
+            </ol>
+          </div>
+          <div className="card-elevated">
+            <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-3">Key exclusions to know</div>
+            <ul className="list-disc pl-5 space-y-2 text-[.95rem] text-[#0F1C2C]">
+              {data.keyExclusions.map((r, i) => <li key={i}>{r}</li>)}
+            </ul>
+          </div>
+        </div>
+
+        <div className="card-elevated mt-5">
+          <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-3">Recommended next steps</div>
+          <ul className="list-disc pl-5 space-y-2 text-[.95rem] text-[#0F1C2C]">
+            {data.recommendedNextSteps.map((r, i) => <li key={i}>{r}</li>)}
+          </ul>
+        </div>
+
+        {/* Talking points (internal-style preview) */}
+        <details className="card-elevated mt-5">
+          <summary className="text-xs tracking-widest uppercase text-[#19A078] font-semibold flex items-center justify-between">
+            <span>Internal sales brief — talking points</span>
+            <span className="text-[#A8A8A8] normal-case tracking-normal text-[.85rem] font-normal">click to expand</span>
+          </summary>
+          <ul className="list-disc pl-5 mt-3 space-y-2 text-[.95rem] text-[#0F1C2C]">
+            {data.talkingPoints.map((r, i) => <li key={i}>{r}</li>)}
+          </ul>
+          <div className="mt-3 text-[.7rem] text-[#A8A8A8]">
+            In production, this section is sent to the assigned advisor in Salesforce + Slack — not shown to the buyer.
+          </div>
+        </details>
+
+        {/* CTAs */}
+        <div className="mt-10 card-elevated bg-[#0F1C2C] text-[#F7FAF2] vouch-mesh-dark p-8 md:p-10">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <div className="text-xs tracking-widest uppercase text-[#3BE0AD] font-semibold mb-2">Ready to close the gaps?</div>
+              <h3 className="font-serif-brand text-[1.6rem] md:text-[2rem] font-semibold leading-tight">
+                Talk through your scorecard with a Vouch specialist.
+              </h3>
+              <p className="mt-2 text-[#F7FAF2]/80 text-[.98rem] max-w-xl">
+                15-minute call. We'll walk every red and yellow finding and tell you exactly what to negotiate at renewal — even if you stay with your current broker.
+              </p>
+            </div>
+            <button className="cta-primary text-[1.05rem] whitespace-nowrap" onClick={onCalendly}>
+              Book my 15-min call →
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-10 text-[.7rem] text-[#A8A8A8] max-w-2xl">
+          This is informational and not a binding offer; final terms determined by underwriting. Ambition Insured.™
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+//  MAIN APP — state machine routing between screens
+// ============================================================
+// ============================================================
+//  QUIZ SIDEBAR (mhtml-derived left-rail checklist)
+// ============================================================
+function QuizSidebar({ currentStep, answers, onJump }) {
+  const sections = [
+    { step: 1, label: "Industry",      done: !!answers.industry },
+    { step: 2, label: "Company",       done: !!answers.subVertical },
+    { step: 3, label: "Size",          done: !!answers.size },
+    { step: 4, label: "Team",          done: !!answers.headcount },
+    { step: 5, label: "Profile",       done: !!(answers.profileFlags && answers.profileFlags.length) },
+    { step: 6, label: "Coming up",     done: !!(answers.triggers && answers.triggers.length) },
+    { step: 7, label: "Your info",     done: false },
+  ];
+  const completed = sections.filter(s => s.done && s.step !== currentStep).length;
+  const pct = Math.round((completed / 7) * 100);
+  return (
+    <aside className="quiz-sidebar hidden md:block">
+      <div className="quiz-sidebar-progress">
+        <div className="flex justify-between text-[13px] text-[#6b7280] mb-2">
+          <span>Progress</span>
+          <span className="font-semibold text-[#3F4956]">{pct}%</span>
+        </div>
+        <div className="quiz-sidebar-rail">
+          <div className="quiz-sidebar-fill" style={{ width: `${pct}%` }} />
+        </div>
+      </div>
+      <nav>
+        {sections.map(s => {
+          const isCurrent = s.step === currentStep;
+          const isDone = s.done && !isCurrent;
+          // Allow jumping back to earlier completed steps; gateA (step 7) is reached after Q6 only
+          const canJump = (s.step <= currentStep || isDone) && s.step <= 6;
+          return (
+            <button
+              key={s.step}
+              className={`quiz-sidebar-item ${isCurrent ? "is-current" : ""}`}
+              disabled={!canJump || !onJump}
+              onClick={() => canJump && onJump && onJump(s.step)}
+            >
+              <span className={`quiz-sidebar-circle ${isDone ? "is-done" : ""} ${isCurrent ? "is-current" : ""}`}>
+                {isDone && (
+                  <svg width="9" height="8" viewBox="0 0 11 9" fill="none" aria-hidden="true">
+                    <path d="M1 4L4 7.5L10 1" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </span>
+              <span className="flex-1">{s.label}</span>
+            </button>
+          );
+        })}
+      </nav>
+    </aside>
+  );
+}
+
+function App() {
+  // High-level route: landing | quiz | gateA | snapshot | gateB | upload | processing | scorecard | calendly
+  const [route, setRoute] = useState("landing");
+  const [quizStep, setQuizStep] = useState(1);
+  const [answers, setAnswers] = useState({
+    industry: "",
+    subVertical: "",
+    size: "",
+    headcount: "",
+    workforceFlags: [],
+    profileFlags: [],
+    triggers: [],
+  });
+  const [formData, setFormData] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState("");
+
+  const setA = (patch) => setAnswers(a => ({ ...a, ...patch }));
+  const toggleArr = (key, v) =>
+    setAnswers(a => ({ ...a, [key]: a[key].includes(v) ? a[key].filter(x => x !== v) : [...a[key], v] }));
+
+  const reset = () => {
+    setRoute("landing");
+    setQuizStep(1);
+    setAnswers({ industry: "", subVertical: "", size: "", headcount: "", workforceFlags: [], profileFlags: [], triggers: [] });
+    setFormData(null);
+    setUploadedFile("");
+  };
+
+  const snapshot = useMemo(() => {
+    if (!answers.industry || !answers.subVertical || !answers.size) return null;
+    return computeSnapshot(answers);
+  }, [answers]);
+
+  const goCalendly = () => {
+    window.open("https://calendly.com/vouch-advisor", "_blank", "noopener");
+  };
+
+  // QUIZ NAV
+  const nextQuiz = () => setQuizStep(s => Math.min(6, s + 1));
+  const backQuiz = () => {
+    if (quizStep === 1) { setRoute("landing"); return; }
+    setQuizStep(s => Math.max(1, s - 1));
+  };
+  const finishQuiz = () => setRoute("gateA");
+
+  // ROUTES
+  if (route === "landing") {
+    return <Landing onPickUpload={() => setRoute("gateB")} onPickQuiz={() => { setRoute("quiz"); setQuizStep(1); }} />;
+  }
+
+  if (route === "quiz") {
+    return (
+      <div className="min-h-screen vouch-mesh flex flex-col">
+        <VouchHeader
+          onReset={reset}
+          step={quizStep}
+          totalSteps={6}
+          onBack={backQuiz}
+          hideProgress={true}
+          formData={formData}
+        />
+        <div className="flex flex-1 min-h-0">
+          <QuizSidebar
+            currentStep={quizStep}
+            answers={answers}
+            onJump={(s) => setQuizStep(s)}
+          />
+          <div className="flex-1 min-w-0">
+            {quizStep === 1 && (
+              <Q1Industry value={answers.industry}
+                onChange={v => setA({ industry: v, subVertical: "" })}
+                onNext={nextQuiz} onBack={backQuiz} />
+            )}
+            {quizStep === 2 && (
+              <Q2SubVertical industry={answers.industry} value={answers.subVertical}
+                onChange={v => setA({ subVertical: v })}
+                onNext={nextQuiz} onBack={backQuiz} />
+            )}
+            {quizStep === 3 && (
+              <Q3Size industry={answers.industry} value={answers.size}
+                onChange={v => setA({ size: v })}
+                onNext={nextQuiz} onBack={backQuiz} />
+            )}
+            {quizStep === 4 && (
+              <Q4People
+                headcount={answers.headcount}
+                workforceFlags={answers.workforceFlags}
+                onChangeHeadcount={v => setA({ headcount: v })}
+                onToggleFlag={v => toggleArr("workforceFlags", v)}
+                onNext={nextQuiz} onBack={backQuiz} />
+            )}
+            {quizStep === 5 && (
+              <Q5Profile values={answers.profileFlags}
+                onToggle={v => toggleArr("profileFlags", v)}
+                onNext={nextQuiz} onBack={backQuiz} />
+            )}
+            {quizStep === 6 && (
+              <Q6Triggers industry={answers.industry} values={answers.triggers}
+                onToggle={v => toggleArr("triggers", v)}
+                onNext={finishQuiz} onBack={backQuiz} />
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (route === "gateA") {
+    return <HubSpotGate ctx="A" onBack={() => { setRoute("quiz"); setQuizStep(6); }} onSubmit={(d) => { setFormData(d); setRoute("snapshot"); }} />;
+  }
+
+  if (route === "snapshot") {
+    return <SnapshotPage
+      snapshot={snapshot}
+      answers={answers}
+      formData={formData}
+      onUpload={() => setRoute("upload")}
+      onCalendly={goCalendly}
+      onResend={() => alert("Prototype: would re-send the snapshot email via HubSpot transactional.")}
+      onReset={reset}
+    />;
+  }
+
+  if (route === "gateB") {
+    return <HubSpotGate ctx="B" onBack={() => setRoute("landing")} onSubmit={(d) => { setFormData(d); setRoute("upload"); }} />;
+  }
+
+  if (route === "upload") {
+    return <UploadScreen
+      onUploaded={(name) => { setUploadedFile(name); setRoute("processing"); }}
+      onBack={() => setRoute(formData ? (snapshot ? "snapshot" : "gateB") : "landing")}
+      onReset={reset}
+      formData={formData}
+    />;
+  }
+
+  if (route === "processing") {
+    return <ProcessingScreen filename={uploadedFile} onDone={() => setRoute("scorecard")} />;
+  }
+
+  if (route === "scorecard") {
+    return <ScorecardPage data={DEMO_SCORECARD} formData={formData} onCalendly={goCalendly} onReset={reset} />;
+  }
+
+  return <Landing onPickUpload={() => setRoute("gateB")} onPickQuiz={() => { setRoute("quiz"); setQuizStep(1); }} />;
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>
+
