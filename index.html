@@ -140,6 +140,41 @@
   @keyframes spinAround { to { transform: rotate(360deg); } }
   .pulse-dot { animation: pulse 1.4s ease-in-out infinite; }
   @keyframes pulse { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
+  /* ── Sticky Apply CTA Banner ── */
+  .sticky-apply-banner {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+    background: var(--vouch-dark);
+    border-top: 1.5px solid rgba(255,255,255,0.08);
+    box-shadow: 0 -4px 32px rgba(15,28,44,0.28);
+    padding: .9rem 1.75rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    animation: slideUpBanner .4s cubic-bezier(.22,.68,0,1.2) both;
+  }
+  @keyframes slideUpBanner { from { transform: translateY(110%); opacity: 0; } to { transform: none; opacity: 1; } }
+  .sticky-apply-banner__left { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+  .sticky-apply-banner__headline {
+    font-family: 'Fraunces', Georgia, serif; font-weight: 600;
+    font-size: 1.05rem; color: var(--vouch-light); line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .sticky-apply-banner__sub {
+    font-size: .82rem; color: var(--vouch-light); opacity: .68; margin-top: 2px;
+  }
+  .sticky-apply-banner__actions { display: flex; align-items: center; gap: .75rem; flex-shrink: 0; }
+  .sticky-apply-banner__btn {
+    background: var(--vouch-green); color: var(--vouch-dark);
+    padding: .72rem 1.6rem; border-radius: 9999px;
+    font-weight: 600; font-size: .92rem; border: none; cursor: pointer;
+    white-space: nowrap; transition: all .15s ease;
+    text-decoration: none; display: inline-flex; align-items: center; gap: .35rem;
+  }
+  .sticky-apply-banner__btn:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(59,224,173,0.40); }
+  .sticky-apply-banner__dismiss {
+    background: transparent; border: none; cursor: pointer;
+    color: var(--vouch-light); font-size: 1.25rem; line-height: 1;
+    padding: .2rem .4rem; opacity: .45; transition: opacity .15s; flex-shrink: 0;
+  }
+  .sticky-apply-banner__dismiss:hover { opacity: .85; }
   .card { background: #fff; border: 1px solid var(--vouch-light-gray); border-radius: 18px; padding: 1.5rem; }
   .card-elevated { background: #fff; border: 1px solid var(--vouch-light-gray); border-radius: 22px; padding: 1.75rem; box-shadow: 0 1px 0 rgba(15,28,44,0.04); }
   .input-base {
@@ -1281,6 +1316,35 @@ function CoverageCard({ cov }) {
   );
 }
 
+// ── Sticky Apply CTA Banner ──────────────────────────────────
+function StickyApplyCTA() {
+  const [visible, setVisible] = React.useState(true);
+  if (!visible) return null;
+  return (
+    <div className="sticky-apply-banner">
+      <div className="sticky-apply-banner__left">
+        <span className="sticky-apply-banner__headline">Ready to apply?</span>
+        <span className="sticky-apply-banner__sub">Get a quote in minutes.</span>
+      </div>
+      <div className="sticky-apply-banner__actions">
+        <a
+          href="https://apply.vouch.us"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="sticky-apply-banner__btn"
+        >
+          Apply now →
+        </a>
+        <button
+          className="sticky-apply-banner__dismiss"
+          onClick={() => setVisible(false)}
+          aria-label="Dismiss"
+        >×</button>
+      </div>
+    </div>
+  );
+}
+
 function SnapshotPage({ snapshot, answers, formData, onUpload, onCalendly, onResend, onReset }) {
   if (!snapshot) return null;
   const { header, summary, coverages, industryClass } = snapshot;
@@ -1301,7 +1365,7 @@ function SnapshotPage({ snapshot, answers, formData, onUpload, onCalendly, onRes
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8" style={{paddingBottom:'96px'}}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {coverages.map((c, i) => (
             <CoverageCard key={c.key + i} cov={c} />
@@ -1347,6 +1411,7 @@ function SnapshotPage({ snapshot, answers, formData, onUpload, onCalendly, onRes
           This is informational and not a binding offer; final terms determined by underwriting. Ambition Insured.™
         </div>
       </div>
+      <StickyApplyCTA />
     </div>
   );
 }
@@ -1498,7 +1563,7 @@ function ScorecardPage({ data, formData, onCalendly, onReset }) {
   return (
     <div className="vouch-mesh min-h-screen">
       <VouchHeader onReset={onReset} formData={formData} />
-      <div className="max-w-6xl mx-auto px-6 pt-10 md:pt-14 pb-12 anim-fade">
+      <div className="max-w-6xl mx-auto px-6 pt-10 md:pt-14 pb-12 anim-fade" style={{paddingBottom:'96px'}}>
         <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-3">
           Policy Analysis — {formData?.firstName ? `for ${formData.firstName}, ${formData.company}` : "your policy"}
         </div>
@@ -1607,6 +1672,7 @@ function ScorecardPage({ data, formData, onCalendly, onReset }) {
           This is informational and not a binding offer; final terms determined by underwriting. Ambition Insured.™
         </div>
       </div>
+      <StickyApplyCTA />
     </div>
   );
 }
