@@ -1181,7 +1181,16 @@ function Q4People({ headcount, workforceFlags, onChangeHeadcount, onToggleFlag, 
   );
 }
 
-function Q5Profile({ values, onToggle, onNext, onBack }) {
+function Q5Profile({ values, onToggle, onNext, onBack, onUploadContract }) {
+  const [nudgeDismissed, setNudgeDismissed] = useState(false);
+  const enterpriseSelected = values.includes("enterprise");
+  const showNudge = enterpriseSelected && !nudgeDismissed;
+
+  // Reset dismiss state if user deselects enterprise
+  useEffect(() => {
+    if (!enterpriseSelected) setNudgeDismissed(false);
+  }, [enterpriseSelected]);
+
   return (
     <QuestionShell
       eyebrow="Question 5 of 6"
@@ -1200,6 +1209,44 @@ function Q5Profile({ values, onToggle, onNext, onBack }) {
           </button>
         ))}
       </div>
+
+      {showNudge && (
+        <div className="anim-fade" style={{
+          marginTop: "20px",
+          background: "#fff",
+          border: "1px solid #D8D9CC",
+          borderLeft: "3px solid #3BE0AD",
+          borderRadius: "3px",
+          padding: "18px 20px",
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: "20px",
+          flexWrap: "wrap",
+        }}>
+          <div style={{flex:"1",minWidth:"220px"}}>
+            <div style={{fontSize:"10px",fontWeight:"800",letterSpacing:"0.14em",textTransform:"uppercase",color:"#19A078",marginBottom:"6px"}}>
+              Have the contracts on hand?
+            </div>
+            <div style={{fontSize:"13.5px",lineHeight:"1.55",color:"#1A2A3A",fontWeight:"500",marginBottom:"4px"}}>
+              Upload your contract requirements now — Claude will identify exactly what coverages and limits you need to satisfy them.
+            </div>
+            <div style={{fontSize:"12px",color:"#5A6A7A",lineHeight:"1.5"}}>
+              Works with vendor agreements, partnership contracts, MSAs, and any doc with insurance language.
+            </div>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:"8px",flexShrink:0,alignItems:"flex-end"}}>
+            <button className="cta-primary" onClick={onUploadContract} style={{whiteSpace:"nowrap"}}>
+              Upload contract requirements →
+            </button>
+            <button
+              onClick={() => setNudgeDismissed(true)}
+              style={{background:"none",border:"none",cursor:"pointer",fontSize:"11.5px",color:"#8A8A7A",textDecoration:"underline",padding:"0",textAlign:"right"}}>
+              I'll add this later
+            </button>
+          </div>
+        </div>
+      )}
     </QuestionShell>
   );
 }
@@ -1353,7 +1400,7 @@ function CoverageCard({ cov }) {
       )}
       <div className="mt-auto pt-3 border-t border-[#EBEAE8] flex items-baseline justify-between">
         <div className="text-xs uppercase tracking-widest text-[#A8A8A8]">Recommended limit</div>
-        <div className="font-serif-brand text-[1.6rem] font-semibold text-[#0F1C2C]">{cov.limit}</div>
+        <div className="text-[1.5rem] font-bold text-[#0F1C2C]" style={{fontFamily:"'Inter',Arial,sans-serif",letterSpacing:"-0.02em"}}>{cov.limit}</div>
       </div>
       {cov.sublimits && cov.sublimits.length > 0 && (
         <div className="-mt-2">
@@ -1761,9 +1808,9 @@ function ScorecardPage({ data, formData, onCalendly, onReset }) {
         </p>
 
         <div className="mt-8 flex flex-wrap gap-3">
-          <div className={`px-4 py-3 style={{borderRadius:'3px'}} className={`${statusClass("red")} font-semibold`}>{counts.red || 0} red — material gaps</div>
-          <div className={`px-4 py-3 style={{borderRadius:'3px'}} className={`${statusClass("yellow")} font-semibold`}>{counts.yellow || 0} yellow — needs attention</div>
-          <div className={`px-4 py-3 style={{borderRadius:'3px'}} className={`${statusClass("green")} font-semibold`}>{counts.green || 0} green — adequate</div>
+          <div className={`px-4 py-3 font-semibold ${statusClass("red")}`} style={{borderRadius:"3px"}}>{counts.red || 0} red — material gaps</div>
+          <div className={`px-4 py-3 font-semibold ${statusClass("yellow")}`} style={{borderRadius:"3px"}}>{counts.yellow || 0} yellow — needs attention</div>
+          <div className={`px-4 py-3 font-semibold ${statusClass("green")}`} style={{borderRadius:"3px"}}>{counts.green || 0} green — adequate</div>
         </div>
 
         {/* Scorecard table */}
@@ -2021,7 +2068,8 @@ function App() {
             {quizStep === 5 && (
               <Q5Profile values={answers.profileFlags}
                 onToggle={v => toggleArr("profileFlags", v)}
-                onNext={nextQuiz} onBack={backQuiz} />
+                onNext={nextQuiz} onBack={backQuiz}
+                onUploadContract={() => { setUploadMode("contract"); setRoute("gateB"); }} />
             )}
             {quizStep === 6 && (
               <Q6Triggers industry={answers.industry} values={answers.triggers}
