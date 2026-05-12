@@ -10,21 +10,21 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --vouch-dark: #0F1C2C;
-    --vouch-light: #F5F2EE;            /* warm cream (was #F7FAF2) */
-    --vouch-mint-cream: #F8FAF2;       /* pale mint cream — input fill, active row */
+    --vouch-dark: #0D1B2A;
+    --vouch-light: #F0F1E5;            /* coinflow olive-cream */
+    --vouch-mint-cream: #F7F8F2;       /* pale warm cream — input fill, active row */
     --vouch-mint-wash: #E8F5EF;        /* selected-section wash */
     --vouch-plum: #3D2040;             /* Vouch plum — header avatar chip */
     --vouch-dark-green: #1A5745;
     --vouch-green: #3BE0AD;
     --vouch-text-green: #19A078;
-    --vouch-yellow: #E8FC83;
+    --vouch-yellow: #CDDE3D;           /* coinflow lime-yellow */
     --vouch-blue: #50EAF2;
-    --vouch-gray: #A8A8A8;
-    --vouch-light-gray: #E8E4DE;       /* warm tan border (was #EBEAE8) */
+    --vouch-gray: #8A8A7A;
+    --vouch-light-gray: #D8D9CC;       /* coinflow warm border */
     --tech-deep: #8F2A04;
     --tech-mid: #CA6233;
     --tech-light: #EDC2A2;
@@ -38,8 +38,8 @@
     --ps-mid: #E3A82B;
     --ps-light: #F6D98A;
   }
-  html, body { background: var(--vouch-light); color: var(--vouch-dark); font-family: 'Inter', Arial, Helvetica, sans-serif; }
-  .font-serif-brand { font-family: 'Fraunces', Georgia, serif; font-feature-settings: "ss01"; letter-spacing: -0.01em; }
+  html, body { background: var(--vouch-light); color: var(--vouch-dark); font-family: 'Inter', Arial, Helvetica, sans-serif; -webkit-font-smoothing: antialiased; }
+  .font-serif-brand { font-family: 'Spectral', 'Cormorant Garamond', Georgia, serif; letter-spacing: -0.01em; }
   .vouch-mesh {
     background:
       radial-gradient(circle at 18% 12%, rgba(59,224,173,.30) 0%, transparent 38%),
@@ -61,16 +61,16 @@
   .industry-ps   { background: linear-gradient(135deg, var(--ps-light)   0%, transparent 60%); }
   .pill {
     display: inline-flex; align-items: center; gap: .5rem;
-    padding: .85rem 1.25rem; border-radius: 9999px;
+    padding: .85rem 1.25rem; border-radius: 3px;
     border: 1.5px solid var(--vouch-dark); background: var(--vouch-light);
     color: var(--vouch-dark); font-weight: 500; font-size: 0.95rem;
     transition: all .15s ease;
     cursor: pointer;
   }
-  .pill:hover { background: var(--vouch-dark); color: var(--vouch-light); transform: translateY(-1px); }
+  .pill:hover { background: var(--vouch-dark); color: var(--vouch-light); }
   .pill.selected { background: var(--vouch-dark); color: var(--vouch-light); }
   .pill-chip {
-    padding: .65rem 1rem; border-radius: 9999px;
+    padding: .65rem 1rem; border-radius: 3px;
     border: 1.5px solid var(--vouch-light-gray); background: var(--vouch-mint-cream);
     font-size: 0.9rem; cursor: pointer; transition: all .15s ease;
   }
@@ -81,20 +81,21 @@
   }
   .cta-primary {
     background: var(--vouch-green); color: var(--vouch-dark);
-    padding: 1.1rem 2rem; border-radius: 9999px;
-    font-weight: 600; font-size: 1.05rem; cursor: pointer;
+    padding: 1rem 1.75rem; border-radius: 3px;
+    font-weight: 700; font-size: 0.92rem; cursor: pointer;
+    letter-spacing: 0.03em;
     transition: all .15s ease; border: none;
-    box-shadow: 0 1px 0 rgba(15,28,44,0.06);
   }
-  .cta-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(59,224,173,0.35); }
-  .cta-primary:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .cta-primary:hover { filter: brightness(0.94); }
+  .cta-primary:disabled { opacity: .4; cursor: not-allowed; }
   .cta-dark {
     background: var(--vouch-dark); color: var(--vouch-light);
-    padding: 1.1rem 2rem; border-radius: 9999px;
-    font-weight: 600; font-size: 1.05rem; cursor: pointer; border: none;
+    padding: 1rem 1.75rem; border-radius: 3px;
+    font-weight: 700; font-size: 0.92rem; cursor: pointer; border: none;
+    letter-spacing: 0.03em;
     transition: all .15s ease;
   }
-  .cta-dark:hover { transform: translateY(-1px); }
+  .cta-dark:hover { filter: brightness(1.12); }
   .cta-link {
     background: transparent; color: var(--vouch-dark);
     padding: .65rem 1rem; border: none; cursor: pointer;
@@ -102,13 +103,19 @@
   }
   .badge {
     display: inline-flex; align-items: center;
-    padding: .25rem .65rem; border-radius: 9999px;
-    font-size: .72rem; font-weight: 700; letter-spacing: .04em;
+    padding: .2rem .6rem; border-radius: 2px;
+    font-size: .68rem; font-weight: 800; letter-spacing: .10em;
     text-transform: uppercase;
   }
   .badge-required { background: var(--vouch-dark); color: var(--vouch-light); }
   .badge-recommended { background: var(--vouch-green); color: var(--vouch-dark); }
   .badge-optional { background: var(--vouch-light-gray); color: #555; }
+  .analysis-badge {
+    background: var(--vouch-yellow); color: var(--vouch-dark);
+    font-size: 10px; font-weight: 800; letter-spacing: 0.14em;
+    padding: 3px 8px 2px 8px; border-radius: 2px; line-height: 1;
+    text-transform: uppercase;
+  }
   .sublimit-chip {
     display: inline-block; margin: .15rem;
     padding: .2rem .55rem; border-radius: 6px;
@@ -123,11 +130,11 @@
   .status-cell-green  { background: #D1FAE5; color: #065F46; }
   .upload-zone {
     border: 2px dashed var(--vouch-dark);
-    border-radius: 18px; padding: 3rem 2rem;
-    background: rgba(255,255,255,.6);
+    border-radius: 3px; padding: 2.5rem 2rem;
+    background: rgba(255,255,255,.7);
     transition: all .2s ease;
   }
-  .upload-zone.drag { background: rgba(59,224,173,.18); border-color: var(--vouch-text-green); }
+  .upload-zone.drag { background: rgba(59,224,173,.15); border-color: var(--vouch-text-green); }
   .progress-rail { height: 4px; background: var(--vouch-light-gray); border-radius: 9999px; overflow: hidden; }
   .progress-fill { height: 100%; background: var(--vouch-dark); transition: width .3s ease; }
   .why-link { font-size: .85rem; color: var(--vouch-text-green); text-decoration: underline; cursor: pointer; }
@@ -144,8 +151,8 @@
   .sticky-apply-banner {
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
     background: var(--vouch-dark);
-    border-top: 1.5px solid rgba(255,255,255,0.08);
-    box-shadow: 0 -4px 32px rgba(15,28,44,0.28);
+    border-top: 1px solid rgba(255,255,255,0.10);
+    box-shadow: 0 -4px 32px rgba(13,27,42,0.32);
     padding: .9rem 1.75rem;
     display: flex; align-items: center; justify-content: space-between; gap: 1rem;
     animation: slideUpBanner .4s cubic-bezier(.22,.68,0,1.2) both;
@@ -163,44 +170,44 @@
   .sticky-apply-banner__actions { display: flex; align-items: center; gap: .75rem; flex-shrink: 0; }
   .sticky-apply-banner__btn {
     background: var(--vouch-green); color: var(--vouch-dark);
-    padding: .72rem 1.6rem; border-radius: 9999px;
-    font-weight: 600; font-size: .92rem; border: none; cursor: pointer;
+    padding: .72rem 1.6rem; border-radius: 3px;
+    font-weight: 700; font-size: .85rem; letter-spacing: 0.03em; border: none; cursor: pointer;
     white-space: nowrap; transition: all .15s ease;
     text-decoration: none; display: inline-flex; align-items: center; gap: .35rem;
   }
-  .sticky-apply-banner__btn:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(59,224,173,0.40); }
+  .sticky-apply-banner__btn:hover { filter: brightness(0.92); }
   .sticky-apply-banner__dismiss {
     background: transparent; border: none; cursor: pointer;
     color: var(--vouch-light); font-size: 1.25rem; line-height: 1;
     padding: .2rem .4rem; opacity: .45; transition: opacity .15s; flex-shrink: 0;
   }
   .sticky-apply-banner__dismiss:hover { opacity: .85; }
-  .card { background: #fff; border: 1px solid var(--vouch-light-gray); border-radius: 18px; padding: 1.5rem; }
-  .card-elevated { background: #fff; border: 1px solid var(--vouch-light-gray); border-radius: 22px; padding: 1.75rem; box-shadow: 0 1px 0 rgba(15,28,44,0.04); }
+  .card { background: #fff; border: 1px solid var(--vouch-light-gray); border-radius: 3px; padding: 1.5rem; }
+  .card-elevated { background: #fff; border: 1px solid var(--vouch-light-gray); border-radius: 3px; padding: 1.75rem; }
   .input-base {
     width: 100%; padding: .85rem 1rem; border: 1.5px solid var(--vouch-light-gray);
-    border-radius: 12px; font-size: .98rem; background: var(--vouch-mint-cream); color: var(--vouch-dark);
+    border-radius: 3px; font-size: .98rem; background: var(--vouch-mint-cream); color: var(--vouch-dark);
     font-family: inherit;
   }
   .input-base:focus { outline: none; border-color: var(--vouch-dark); background: #fff; }
   /* Card-stack form pattern (Q4 / Q6) — mhtml-derived */
   .form-card {
     background: #fff; border: 1px solid var(--vouch-light-gray);
-    border-radius: 12px; padding: 24px 28px; margin-bottom: 16px;
+    border-radius: 3px; padding: 24px 28px; margin-bottom: 16px;
   }
   .form-card-title { font-weight: 600; font-size: 14px; color: #1a1a1a; margin-bottom: 12px; }
   .form-card-help  { font-size: 13px; color: #6b7280; margin: 4px 0 12px; line-height: 1.5; }
   .cta-primary-wide {
-    width: 100%; padding: 13px 0; border-radius: 8px; border: none;
+    width: 100%; padding: 13px 0; border-radius: 3px; border: none;
     background: var(--vouch-green); color: var(--vouch-dark);
-    font-weight: 600; font-size: 14px; cursor: pointer;
+    font-weight: 700; font-size: 13px; letter-spacing: 0.03em; cursor: pointer;
     transition: filter .15s ease;
   }
-  .cta-primary-wide:hover:not(:disabled) { filter: brightness(0.96); }
+  .cta-primary-wide:hover:not(:disabled) { filter: brightness(0.92); }
   .cta-primary-wide:disabled { opacity: .45; cursor: not-allowed; }
   /* Quiz sidebar checklist — mhtml-derived */
   .quiz-sidebar {
-    width: 240px; flex-shrink: 0;
+    width: 220px; flex-shrink: 0;
     background: var(--vouch-mint-cream);
     border-right: 1px solid var(--vouch-light-gray);
     padding: 28px 0 32px;
@@ -876,13 +883,13 @@ function VouchHeader({ onReset, step, totalSteps, onBack, formData, hideProgress
       ? `${(formData.firstName || "").charAt(0)}${(formData.lastName || "").charAt(0)}`.toUpperCase()
       : "";
   return (
-    <header className="w-full px-6 py-4 flex items-center justify-between border-b border-[var(--vouch-light-gray)] bg-white/60 backdrop-blur sticky top-0 z-10">
+    <header className="w-full px-6 py-3 flex items-center justify-between border-b border-[var(--vouch-light-gray)] bg-[#F0F1E5] sticky top-0 z-10">
       <div className="flex items-center gap-3 cursor-pointer" onClick={onReset}>
-        <div className="w-9 h-9 rounded-full bg-[#0F1C2C] text-[#3BE0AD] flex items-center justify-center font-serif-brand text-lg font-bold">V</div>
-        <div className="leading-tight">
-          <div className="font-serif-brand text-[1.05rem] font-semibold text-[#0F1C2C]">Vouch</div>
-          <div className="text-[.7rem] tracking-widest uppercase text-[#19A078] font-medium">Coverage Intelligence</div>
-        </div>
+        <svg width="72" height="24" viewBox="0 0 72 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0.5" y="0.5" width="71" height="23" rx="1.5" stroke="#0D1B2A" strokeWidth="1"/>
+          <text x="36" y="16.5" textAnchor="middle" fontFamily="'Inter',Arial,sans-serif" fontWeight="800" fontSize="12" letterSpacing="0.12em" fill="#0D1B2A">VOUCH</text>
+        </svg>
+        <span className="analysis-badge">COVERAGE INTELLIGENCE</span>
       </div>
       {!hideProgress && typeof step === "number" && totalSteps && (
         <div className="hidden md:flex flex-1 mx-10 items-center gap-3">
@@ -943,72 +950,115 @@ function QuestionShell({ children, title, eyebrow, why, onNext, onBack, nextLabe
 //  LANDING / PATH SELECTOR
 //  Per Clark: upload is PRIMARY large CTA; quiz is SECONDARY smaller CTA.
 // ============================================================
-function Landing({ onPickUpload, onPickQuiz }) {
+function Landing({ onPickUpload, onPickContract, onPickQuiz }) {
   return (
-    <div className="vouch-mesh min-h-screen">
-      <div className="max-w-5xl mx-auto px-6 pt-16 md:pt-24 pb-20">
-        <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-5">
-          Vouch Coverage Intelligence
+    <div className="min-h-screen" style={{background:"#F0F1E5"}}>
+      {/* Page header */}
+      <header style={{padding:"18px 48px 0 48px"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"12px"}}>
+            <svg width="72" height="24" viewBox="0 0 72 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0.5" y="0.5" width="71" height="23" rx="1.5" stroke="#0D1B2A" strokeWidth="1"/>
+              <text x="36" y="16.5" textAnchor="middle" fontFamily="'Inter',Arial,sans-serif" fontWeight="800" fontSize="12" letterSpacing="0.12em" fill="#0D1B2A">VOUCH</text>
+            </svg>
+            <span className="analysis-badge">COVERAGE INTELLIGENCE</span>
+          </div>
+          <div style={{fontSize:"11px",fontWeight:"600",letterSpacing:"0.10em",textTransform:"uppercase",color:"#0D1B2A"}}>
+            VOUCH.US
+          </div>
         </div>
-        <h1 className="font-serif-brand text-[2.6rem] md:text-[4.1rem] leading-[1.02] font-semibold text-[#0F1C2C]">
-          See exactly where your insurance <span className="hl-yellow">falls short</span>.
+        <div style={{marginTop:"16px",height:"1px",background:"#C8C9B8"}}/>
+      </header>
+
+      <div className="max-w-4xl mx-auto px-6 pt-14 pb-20">
+
+        {/* Headline */}
+        <div style={{fontSize:"11px",fontWeight:"800",letterSpacing:"0.18em",textTransform:"uppercase",color:"#0D1B2A",marginBottom:"14px"}}>
+          What brings you here today?
+        </div>
+        <h1 className="font-serif-brand" style={{fontSize:"clamp(2.4rem,5vw,3.6rem)",lineHeight:"1.04",fontWeight:"600",color:"#0D1B2A",margin:"0 0 14px 0",letterSpacing:"-0.01em"}}>
+          Know exactly what coverage<br/>you need — and whether yours holds up.
         </h1>
-        <p className="mt-6 max-w-2xl text-[1.1rem] md:text-[1.2rem] text-[#0F1C2C]/80 leading-snug">
-          Drop in your existing policy and we'll grade it line-by-line against Vouch's expert rubric — sublimits, exclusions, and form-language gaps your broker probably never mentioned. Most startups are underinsured at Series B because nobody told them what changed.
+        <p style={{fontSize:"15px",lineHeight:"1.6",color:"#2A3A4A",maxWidth:"580px",margin:"0 0 40px 0"}}>
+          Vouch graded over 6,000 startup programs. Whether you have policies to review, contract requirements to decode, or are building your program from scratch — start here.
         </p>
 
-        {/* PRIMARY large CTA — upload */}
-        <div className="mt-12 card-elevated p-8 md:p-10 max-w-3xl">
-          <div className="flex items-start gap-3 mb-3">
-            <div className="text-xs px-2 py-0.5 rounded-full bg-[#0F1C2C] text-[#3BE0AD] font-semibold tracking-wider uppercase">Recommended</div>
-            <div className="text-xs px-2 py-0.5 rounded-full bg-[#E8FC83] text-[#0F1C2C] font-semibold tracking-wider uppercase">Most accurate</div>
+        {/* PATH B — Primary: Upload existing policies */}
+        <div style={{background:"#fff",border:"1px solid #D8D9CC",borderRadius:"3px",padding:"32px 36px",marginBottom:"12px"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"14px"}}>
+            <span style={{background:"#0D1B2A",color:"#3BE0AD",fontSize:"10px",fontWeight:"800",letterSpacing:"0.14em",padding:"3px 8px 2px",borderRadius:"2px",textTransform:"uppercase"}}>Recommended</span>
+            <span style={{background:"#CDDE3D",color:"#0D1B2A",fontSize:"10px",fontWeight:"800",letterSpacing:"0.14em",padding:"3px 8px 2px",borderRadius:"2px",textTransform:"uppercase"}}>Most accurate</span>
           </div>
-          <h2 className="font-serif-brand text-[1.85rem] md:text-[2.35rem] leading-tight font-semibold text-[#0F1C2C]">
-            Upload your existing policy
-          </h2>
-          <p className="mt-2 text-[1rem] md:text-[1.05rem] text-[#0F1C2C]/80 max-w-xl">
-            Get a full red / yellow / green scorecard graded against the same rubric our specialists use. PDF works. Takes about 90 seconds.
-          </p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <button className="cta-primary text-[1.1rem]" onClick={onPickUpload}>
-              Upload my policy →
-            </button>
-            <span className="text-[.85rem] text-[#0F1C2C]/60">PDF · encrypted in transit · no obligation</span>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:"32px",flexWrap:"wrap"}}>
+            <div style={{flex:"1",minWidth:"260px"}}>
+              <h2 className="font-serif-brand" style={{fontSize:"1.75rem",fontWeight:"600",color:"#0D1B2A",lineHeight:"1.1",margin:"0 0 10px 0"}}>
+                I have existing policies to review
+              </h2>
+              <p style={{fontSize:"13.5px",lineHeight:"1.6",color:"#2A3A4A",margin:"0"}}>
+                Upload one or more policies — E&amp;O, D&amp;O, Cyber, Crime, EPL, Fiduciary — and get a full red / yellow / green scorecard graded against the same rubric our specialists use. Sublimits, exclusions, and form-language gaps your broker probably never read out loud.
+              </p>
+            </div>
+            <div style={{flexShrink:"0",display:"flex",flexDirection:"column",alignItems:"flex-end",gap:"10px",paddingTop:"4px"}}>
+              <button className="cta-primary" onClick={onPickUpload}>
+                Upload my policies →
+              </button>
+              <span style={{fontSize:"11.5px",color:"#8A8A7A"}}>PDF · encrypted in transit · no obligation</span>
+            </div>
           </div>
         </div>
 
-        {/* SECONDARY smaller CTA — quiz */}
-        <div className="mt-8 max-w-3xl flex flex-col md:flex-row md:items-center md:justify-between gap-4 px-6 py-5 rounded-2xl border border-[#EBEAE8] bg-white/60">
-          <div>
-            <div className="text-xs tracking-widest uppercase text-[#A8A8A8] font-semibold">Don't have a policy yet?</div>
-            <h3 className="font-serif-brand text-[1.25rem] font-semibold text-[#0F1C2C] leading-tight">
-              Take the 2-minute coverage quiz
+        {/* Two secondary paths side by side */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"36px"}}>
+
+          {/* PATH C — Contract requirements (new) */}
+          <div style={{background:"#fff",border:"1px solid #D8D9CC",borderRadius:"3px",padding:"24px 28px"}}>
+            <div style={{fontSize:"10px",fontWeight:"800",letterSpacing:"0.16em",textTransform:"uppercase",color:"#8A8A7A",marginBottom:"10px"}}>
+              No policy yet?
+            </div>
+            <h3 className="font-serif-brand" style={{fontSize:"1.3rem",fontWeight:"600",color:"#0D1B2A",lineHeight:"1.15",margin:"0 0 10px 0"}}>
+              I have contract requirements
             </h3>
-            <p className="text-[.9rem] text-[#0F1C2C]/70 max-w-md">
-              6 quick questions → personalized snapshot of what coverages and limits a company in your profile typically needs.
+            <p style={{fontSize:"13px",lineHeight:"1.55",color:"#2A3A4A",margin:"0 0 18px 0"}}>
+              Upload a vendor agreement, partnership contract, or any document with insurance requirements. We'll identify exactly what coverages and limits you need to satisfy it.
             </p>
+            <button className="cta-dark" style={{width:"100%",textAlign:"center"}} onClick={onPickContract}>
+              Upload my contract →
+            </button>
           </div>
-          <button className="cta-dark whitespace-nowrap text-[.95rem]" onClick={onPickQuiz}>
-            Start the quiz →
-          </button>
+
+          {/* PATH A — Quiz */}
+          <div style={{background:"#fff",border:"1px solid #D8D9CC",borderRadius:"3px",padding:"24px 28px"}}>
+            <div style={{fontSize:"10px",fontWeight:"800",letterSpacing:"0.16em",textTransform:"uppercase",color:"#8A8A7A",marginBottom:"10px"}}>
+              Starting from scratch?
+            </div>
+            <h3 className="font-serif-brand" style={{fontSize:"1.3rem",fontWeight:"600",color:"#0D1B2A",lineHeight:"1.15",margin:"0 0 10px 0"}}>
+              Take the 2-minute quiz
+            </h3>
+            <p style={{fontSize:"13px",lineHeight:"1.55",color:"#2A3A4A",margin:"0 0 18px 0"}}>
+              6 questions → a personalized snapshot of the coverages and limits a company with your profile typically needs. Tailored to your industry, size, and risk signals.
+            </p>
+            <button className="cta-dark" style={{width:"100%",textAlign:"center"}} onClick={onPickQuiz}>
+              Start the quiz →
+            </button>
+          </div>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl text-[.85rem] text-[#0F1C2C]/70">
-          <div className="card-elevated">
-            <div className="font-semibold mb-1 text-[#0F1C2C]">6,000+ companies</div>
-            Insured by Vouch across Tech, Healthcare, Financial, and Professional Services.
-          </div>
-          <div className="card-elevated">
-            <div className="font-semibold mb-1 text-[#0F1C2C]">Form-language depth</div>
-            We grade what most brokers never read — exclusions, carve-backs, and sublimits.
-          </div>
-          <div className="card-elevated">
-            <div className="font-semibold mb-1 text-[#0F1C2C]">Specialist handoff</div>
-            Every result routes to a sub-vertical expert — not a generalist.
-          </div>
+        {/* Trust bar */}
+        <div style={{borderTop:"1px solid #D8D9CC",paddingTop:"28px",display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0"}}>
+          {[
+            {label:"6,000+ companies",body:"Insured by Vouch across Tech, Healthcare, Financial Services, and Professional Services."},
+            {label:"Form-language depth",body:"We grade what most brokers never read — exclusions, carve-backs, and sublimit language."},
+            {label:"Specialist handoff",body:"Every result routes to a sub-vertical expert — not a generalist broker."},
+          ].map((item, i) => (
+            <div key={i} style={{padding:"0 28px 0 0",borderRight: i < 2 ? "1px solid #D8D9CC" : "none",marginRight: i < 2 ? "28px" : "0"}}>
+              <div style={{fontSize:"11px",fontWeight:"800",letterSpacing:"0.10em",textTransform:"uppercase",color:"#0D1B2A",marginBottom:"6px"}}>{item.label}</div>
+              <div style={{fontSize:"12.5px",lineHeight:"1.55",color:"#3A4A5A"}}>{item.body}</div>
+            </div>
+          ))}
         </div>
-        <div className="mt-12 text-[.7rem] text-[#A8A8A8] max-w-2xl">
-          This is informational and not a binding offer; final terms determined by underwriting. Ambition Insured.™
+
+        <div style={{marginTop:"28px",fontSize:"11px",color:"#8A8A7A",maxWidth:"600px",lineHeight:"1.5"}}>
+          This is informational and not a binding offer; final terms determined by underwriting. Vouch Insurance Services, Inc. Ambition Insured.™
         </div>
       </div>
     </div>
@@ -1214,7 +1264,7 @@ function HubSpotGate({ onSubmit, onBack, ctx }) {
       : "We'll email a copy of your snapshot and unlock the full results below.";
 
   return (
-    <div className="vouch-mesh min-h-screen">
+    <div className="min-h-screen" style={{background:"#F0F1E5"}}>
       <div className="max-w-2xl mx-auto px-6 py-12 md:py-20 anim-fade">
         <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-4">
           Almost there
@@ -1349,7 +1399,7 @@ function SnapshotPage({ snapshot, answers, formData, onUpload, onCalendly, onRes
   if (!snapshot) return null;
   const { header, summary, coverages, industryClass } = snapshot;
   return (
-    <div className="vouch-mesh min-h-screen">
+    <div className="min-h-screen" style={{background:"#F0F1E5"}}>
       <VouchHeader onReset={onReset} formData={formData} />
       <div className={`anim-fade ${industryClass}`}>
         <div className="max-w-6xl mx-auto px-6 pt-10 md:pt-16 pb-6">
@@ -1419,7 +1469,143 @@ function SnapshotPage({ snapshot, answers, formData, onUpload, onCalendly, onRes
 // ============================================================
 //  PATH B — UPLOAD
 // ============================================================
+const POLICY_TYPES = [
+  { key: "eo",        label: "E&O",               sub: "Errors & Omissions / Tech E&O" },
+  { key: "do",        label: "D&O",               sub: "Directors & Officers" },
+  { key: "cyber",     label: "Cyber",             sub: "First & Third Party" },
+  { key: "crime",     label: "Crime",             sub: "Social Engineering / FTF" },
+  { key: "epl",       label: "EPL",               sub: "Employment Practices Liability" },
+  { key: "fiduciary", label: "Fiduciary",         sub: "ERISA / Benefit Plan" },
+];
+
+function PolicySlot({ ptype, file, dragActive, onDrop, onDragOver, onDragLeave, onClick, onRemove, fileRef }) {
+  return (
+    <div
+      style={{
+        border: dragActive ? "2px dashed #19A078" : "2px dashed #D8D9CC",
+        borderRadius: "3px",
+        padding: "16px 18px",
+        background: dragActive ? "rgba(59,224,173,0.08)" : (file ? "#F7FAF5" : "#fff"),
+        cursor: file ? "default" : "pointer",
+        transition: "all .15s ease",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "12px",
+      }}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+      onClick={file ? undefined : onClick}
+    >
+      <input ref={fileRef} type="file" accept="application/pdf,image/*" style={{display:"none"}}
+        onChange={e => { const f = e.target.files?.[0]; if(f) onDrop({dataTransfer:{files:[f]}, preventDefault:()=>{}}); }} />
+      <div style={{display:"flex",alignItems:"center",gap:"12px"}}>
+        <div style={{
+          width:"44px",height:"44px",borderRadius:"2px",flexShrink:"0",
+          background: file ? "#0D1B2A" : "#F0F1E5",
+          border:"1px solid #D8D9CC",
+          display:"flex",alignItems:"center",justifyContent:"center",
+        }}>
+          {file
+            ? <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M5 2h7l4 4v12a1 1 0 01-1 1H5a1 1 0 01-1-1V3a1 1 0 011-1z" fill="#3BE0AD"/><path d="M12 2v5h5" stroke="#3BE0AD" strokeWidth="1.5"/></svg>
+            : <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M5 2h7l4 4v12a1 1 0 01-1 1H5a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="#8A8A7A" strokeWidth="1.5" fill="none"/><path d="M12 2v5h5" stroke="#8A8A7A" strokeWidth="1.5"/><path d="M10 9v5M7.5 11.5l2.5-2.5 2.5 2.5" stroke="#8A8A7A" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          }
+        </div>
+        <div>
+          <div style={{fontSize:"12px",fontWeight:"800",letterSpacing:"0.10em",textTransform:"uppercase",color:"#0D1B2A"}}>{ptype.label}</div>
+          <div style={{fontSize:"11.5px",color:"#5A6A7A",marginTop:"1px"}}>{ptype.sub}</div>
+          {file && <div style={{fontSize:"11px",color:"#19A078",marginTop:"3px",fontWeight:"600"}}>{file}</div>}
+          {!file && <div style={{fontSize:"11px",color:"#8A8A7A",marginTop:"2px"}}>Drop PDF or click to select</div>}
+        </div>
+      </div>
+      {file
+        ? <button onClick={e => { e.stopPropagation(); onRemove(); }}
+            style={{background:"none",border:"none",cursor:"pointer",color:"#8A8A7A",fontSize:"18px",lineHeight:"1",padding:"4px",flexShrink:0}} title="Remove">×</button>
+        : <div style={{fontSize:"11px",fontWeight:"700",color:"#D8D9CC",letterSpacing:"0.04em"}}>OPTIONAL</div>
+      }
+    </div>
+  );
+}
+
 function UploadScreen({ onUploaded, onBack, onReset, formData }) {
+  const [uploads, setUploads] = useState({});  // key → filename
+  const [dragKey, setDragKey] = useState(null);
+  const fileRefs = useRef({});
+
+  const handleDrop = (key, e) => {
+    e.preventDefault();
+    setDragKey(null);
+    const f = e.dataTransfer?.files?.[0] || (e.target?.files?.[0]);
+    if (f) setUploads(u => ({ ...u, [key]: f.name }));
+  };
+
+  const anyUploaded = Object.keys(uploads).length > 0;
+
+  const handleSubmit = () => {
+    const names = Object.entries(uploads).map(([k,v]) => `${k.toUpperCase()}: ${v}`).join(" | ");
+    setTimeout(() => onUploaded(names || "policy.pdf"), 400);
+  };
+
+  return (
+    <div className="min-h-screen" style={{background:"#F0F1E5"}}>
+      <VouchHeader onReset={onReset} formData={formData} />
+      <div className="max-w-3xl mx-auto px-6 py-12 anim-fade">
+
+        <div style={{fontSize:"10px",fontWeight:"800",letterSpacing:"0.18em",textTransform:"uppercase",color:"#19A078",marginBottom:"12px"}}>
+          Step 2 of 2 — Upload your policies
+        </div>
+        <h2 className="font-serif-brand" style={{fontSize:"clamp(1.8rem,4vw,2.5rem)",fontWeight:"600",color:"#0D1B2A",lineHeight:"1.06",margin:"0 0 10px 0"}}>
+          Upload your current policies.
+        </h2>
+        <p style={{fontSize:"14px",lineHeight:"1.6",color:"#2A3A4A",maxWidth:"560px",margin:"0 0 28px 0"}}>
+          Add as many as apply — each policy is graded separately against Vouch's coverage rubric for that line. PDF works best. You don't need all of them to proceed.
+        </p>
+
+        {/* Policy slots */}
+        <div style={{display:"flex",flexDirection:"column",gap:"8px",marginBottom:"20px"}}>
+          {POLICY_TYPES.map(pt => (
+            <PolicySlot
+              key={pt.key}
+              ptype={pt}
+              file={uploads[pt.key] || null}
+              dragActive={dragKey === pt.key}
+              onDragOver={e => { e.preventDefault(); setDragKey(pt.key); }}
+              onDragLeave={() => setDragKey(null)}
+              onDrop={e => handleDrop(pt.key, e)}
+              onClick={() => { if (!fileRefs.current[pt.key]) fileRefs.current[pt.key] = document.createElement('input'); fileRefs.current[pt.key].type='file'; fileRefs.current[pt.key].accept='application/pdf,image/*'; fileRefs.current[pt.key].onchange=e=>handleDrop(pt.key,{dataTransfer:null,preventDefault:()=>{},target:e.target}); fileRefs.current[pt.key].click(); }}
+              onRemove={() => setUploads(u => { const n={...u}; delete n[pt.key]; return n; })}
+              fileRef={el => fileRefs.current[pt.key] = el}
+            />
+          ))}
+        </div>
+
+        {/* Trust micro-chips */}
+        <div style={{display:"flex",gap:"8px",flexWrap:"wrap",marginBottom:"28px"}}>
+          {["PDF · encrypted in transit","No obligation — a scorecard, not a quote","Routed to a sub-vertical specialist"].map((t,i) => (
+            <span key={i} style={{fontSize:"11px",fontWeight:"600",letterSpacing:"0.06em",color:"#5A6A7A",background:"#fff",border:"1px solid #D8D9CC",borderRadius:"2px",padding:"4px 10px"}}>{t}</span>
+          ))}
+        </div>
+
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"16px"}}>
+          <button className="cta-link" onClick={onBack}>← Back</button>
+          <button className="cta-primary" onClick={handleSubmit} disabled={!anyUploaded} style={{opacity: anyUploaded ? 1 : 0.4, cursor: anyUploaded ? "pointer" : "not-allowed"}}>
+            {anyUploaded ? `Analyze ${Object.keys(uploads).length} polic${Object.keys(uploads).length === 1 ? "y" : "ies"} →` : "Upload at least one policy"}
+          </button>
+        </div>
+
+        <div style={{marginTop:"24px",fontSize:"11px",color:"#8A8A7A",maxWidth:"480px",lineHeight:"1.5"}}>
+          Prototype: filenames are captured but files aren't actually parsed. The scorecard is pre-canned demo data.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+//  PATH C — CONTRACT REQUIREMENTS UPLOAD
+// ============================================================
+function ContractUploadScreen({ onUploaded, onBack, onReset, formData }) {
   const [drag, setDrag] = useState(false);
   const [filename, setFilename] = useState("");
   const fileRef = useRef(null);
@@ -1427,70 +1613,70 @@ function UploadScreen({ onUploaded, onBack, onReset, formData }) {
   const accept = (file) => {
     if (!file) return;
     setFilename(file.name);
-    setTimeout(() => onUploaded(file.name), 600);
+    setTimeout(() => onUploaded(file.name), 400);
   };
 
   return (
-    <div className="vouch-mesh min-h-screen">
+    <div className="min-h-screen" style={{background:"#F0F1E5"}}>
       <VouchHeader onReset={onReset} formData={formData} />
-      <div className="max-w-3xl mx-auto px-6 py-12 md:py-16 anim-fade">
-        <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-4">
-          Step 2 of 2 — upload your policy
+      <div className="max-w-2xl mx-auto px-6 py-12 anim-fade">
+
+        <div style={{fontSize:"10px",fontWeight:"800",letterSpacing:"0.18em",textTransform:"uppercase",color:"#19A078",marginBottom:"12px"}}>
+          Coverage requirements — Step 2 of 2
         </div>
-        <h2 className="font-serif-brand text-[2.1rem] md:text-[2.7rem] leading-tight font-semibold text-[#0F1C2C]">
-          Drop your current policy.
+        <h2 className="font-serif-brand" style={{fontSize:"clamp(1.8rem,4vw,2.5rem)",fontWeight:"600",color:"#0D1B2A",lineHeight:"1.06",margin:"0 0 10px 0"}}>
+          Upload your contract or agreement.
         </h2>
-        <p className="mt-3 text-[1.02rem] text-[#0F1C2C]/75 max-w-xl">
-          PDF works best. We'll grade each line against Vouch's rubric — sublimits, exclusions, and form-language gaps your broker probably never read out loud.
+        <p style={{fontSize:"14px",lineHeight:"1.6",color:"#2A3A4A",maxWidth:"520px",margin:"0 0 28px 0"}}>
+          Share the vendor agreement, partnership contract, or any document with insurance requirements. Claude will identify exactly which coverages, limits, and endorsements you need to satisfy it — and flag anything unusual or missing.
         </p>
 
+        {/* What to upload examples */}
+        <div style={{background:"#fff",border:"1px solid #D8D9CC",borderRadius:"3px",padding:"16px 20px",marginBottom:"20px"}}>
+          <div style={{fontSize:"10px",fontWeight:"800",letterSpacing:"0.14em",textTransform:"uppercase",color:"#0D1B2A",marginBottom:"10px"}}>What to upload</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px 24px"}}>
+            {["Vendor or supplier agreement","Partnership or reseller contract","Client MSA or SOW","Enterprise software contract","Investor term sheet with insurance covenants","Lease or facility agreement"].map((ex,i) => (
+              <div key={i} style={{fontSize:"12.5px",color:"#2A3A4A",display:"flex",alignItems:"center",gap:"8px"}}>
+                <span style={{width:"5px",height:"5px",borderRadius:"50%",background:"#3BE0AD",flexShrink:0,display:"inline-block"}}/>
+                {ex}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Drop zone */}
         <div
-          className={`upload-zone mt-8 text-center cursor-pointer ${drag ? "drag" : ""}`}
+          className={`upload-zone text-center cursor-pointer ${drag ? "drag" : ""}`}
+          style={{marginBottom:"20px"}}
           onDragOver={e => { e.preventDefault(); setDrag(true); }}
           onDragLeave={() => setDrag(false)}
-          onDrop={e => {
-            e.preventDefault(); setDrag(false);
-            const f = e.dataTransfer.files?.[0]; if (f) accept(f);
-          }}
+          onDrop={e => { e.preventDefault(); setDrag(false); const f = e.dataTransfer.files?.[0]; if(f) accept(f); }}
           onClick={() => fileRef.current?.click()}
         >
-          <input
-            ref={fileRef}
-            type="file"
-            accept="application/pdf,image/*"
-            className="hidden"
-            onChange={e => accept(e.target.files?.[0])}
-          />
-          <div className="font-serif-brand text-[1.3rem] font-semibold text-[#0F1C2C]">
-            {filename ? `Uploaded: ${filename}` : "Drop your policy here"}
+          <input ref={fileRef} type="file" accept="application/pdf,image/*,.doc,.docx"
+            style={{display:"none"}} onChange={e => accept(e.target.files?.[0])} />
+          <div style={{fontSize:"1.1rem",fontWeight:"600",color:filename?"#0D1B2A":"#5A6A7A",fontFamily:"inherit"}}>
+            {filename ? `✓  ${filename}` : "Drop your contract here"}
           </div>
-          <div className="mt-1 text-[.9rem] text-[#0F1C2C]/70">
-            or click to choose a file · PDF or image · max ~25MB
+          <div style={{marginTop:"4px",fontSize:"12.5px",color:"#8A8A7A"}}>
+            or click to choose · PDF or Word · max ~25MB
           </div>
-          <div className="mt-5">
-            <span className="cta-primary inline-block">Choose file</span>
+          <div style={{marginTop:"16px"}}>
+            <span className="cta-primary">{filename ? "Change file" : "Choose file"}</span>
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 text-[.85rem]">
-          <div className="card-elevated">
-            <div className="font-semibold mb-1">Encrypted in transit</div>
-            <div className="text-[#0F1C2C]/70">PII and beneficial-owner info stay private.</div>
-          </div>
-          <div className="card-elevated">
-            <div className="font-semibold mb-1">No obligation</div>
-            <div className="text-[#0F1C2C]/70">A scorecard, not a quote. Switching brokers is your call.</div>
-          </div>
-          <div className="card-elevated">
-            <div className="font-semibold mb-1">Specialist review</div>
-            <div className="text-[#0F1C2C]/70">Routed to a sub-vertical expert — not a generalist.</div>
-          </div>
+        {/* Trust chips */}
+        <div style={{display:"flex",gap:"8px",flexWrap:"wrap",marginBottom:"28px"}}>
+          {["Encrypted in transit","No obligation","Specialist review"].map((t,i) => (
+            <span key={i} style={{fontSize:"11px",fontWeight:"600",color:"#5A6A7A",background:"#fff",border:"1px solid #D8D9CC",borderRadius:"2px",padding:"4px 10px"}}>{t}</span>
+          ))}
         </div>
 
-        <div className="mt-10 flex items-center justify-between">
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <button className="cta-link" onClick={onBack}>← Back</button>
-          <div className="text-[.7rem] text-[#A8A8A8] max-w-sm text-right">
-            Prototype: filename is captured but the file isn't actually parsed. The scorecard is pre-canned demo data.
+          <div style={{fontSize:"11px",color:"#8A8A7A",maxWidth:"320px",textAlign:"right",lineHeight:"1.5"}}>
+            Prototype: file is captured but not parsed. Results will be pre-canned demo data.
           </div>
         </div>
       </div>
@@ -1518,10 +1704,10 @@ function ProcessingScreen({ onDone, filename }) {
   }, [tick]);
 
   return (
-    <div className="vouch-mesh min-h-screen">
+    <div className="min-h-screen" style={{background:"#F0F1E5"}}>
       <div className="max-w-2xl mx-auto px-6 py-24 anim-fade text-center">
-        <div className="inline-block w-14 h-14 rounded-full border-4 border-[#3BE0AD] border-t-transparent anim-spin" />
-        <h2 className="mt-8 font-serif-brand text-[2rem] md:text-[2.5rem] leading-tight font-semibold text-[#0F1C2C]">
+        <div className="inline-block w-14 h-14 border-4 border-[#3BE0AD] border-t-transparent anim-spin" style={{borderRadius:"3px"}} />
+        <h2 className="mt-8 font-serif-brand text-[2rem] md:text-[2.5rem] leading-tight font-semibold text-[#0D1B2A]">
           Analyzing your policy…
         </h2>
         {filename && (
@@ -1561,23 +1747,23 @@ function statusClass(status) {
 function ScorecardPage({ data, formData, onCalendly, onReset }) {
   const counts = data.rows.reduce((acc, r) => { acc[r.status] = (acc[r.status] || 0) + 1; return acc; }, { red: 0, yellow: 0, green: 0 });
   return (
-    <div className="vouch-mesh min-h-screen">
+    <div className="min-h-screen" style={{background:"#F0F1E5"}}>
       <VouchHeader onReset={onReset} formData={formData} />
       <div className="max-w-6xl mx-auto px-6 pt-10 md:pt-14 pb-12 anim-fade" style={{paddingBottom:'96px'}}>
-        <div className="text-xs tracking-widest uppercase text-[#19A078] font-semibold mb-3">
+        <div style={{fontSize:"10px",fontWeight:"800",letterSpacing:"0.18em",textTransform:"uppercase",color:"#19A078",marginBottom:"12px"}}>
           Policy Analysis — {formData?.firstName ? `for ${formData.firstName}, ${formData.company}` : "your policy"}
         </div>
-        <h1 className="font-serif-brand text-[2.2rem] md:text-[3rem] leading-[1.04] font-semibold text-[#0F1C2C]">
-          Your policy, <span className="hl-yellow">graded</span>.
+        <h1 className="font-serif-brand text-[2.2rem] md:text-[3rem] leading-[1.04] font-semibold" style={{color:"#0D1B2A"}}>
+          Your polic{`y`}, <span className="hl-yellow">graded</span>.
         </h1>
         <p className="mt-3 text-[1.02rem] text-[#0F1C2C]/80 max-w-3xl">
           We reviewed <span className="font-semibold">{data.policyholder}</span> ({data.carrier}, {data.effective}) against Vouch's coverage rubric. Here's what we found — line by line.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-3">
-          <div className={`px-4 py-3 rounded-xl ${statusClass("red")} font-semibold`}>{counts.red || 0} red — material gaps</div>
-          <div className={`px-4 py-3 rounded-xl ${statusClass("yellow")} font-semibold`}>{counts.yellow || 0} yellow — needs attention</div>
-          <div className={`px-4 py-3 rounded-xl ${statusClass("green")} font-semibold`}>{counts.green || 0} green — adequate</div>
+          <div className={`px-4 py-3 style={{borderRadius:'3px'}} className={`${statusClass("red")} font-semibold`}>{counts.red || 0} red — material gaps</div>
+          <div className={`px-4 py-3 style={{borderRadius:'3px'}} className={`${statusClass("yellow")} font-semibold`}>{counts.yellow || 0} yellow — needs attention</div>
+          <div className={`px-4 py-3 style={{borderRadius:'3px'}} className={`${statusClass("green")} font-semibold`}>{counts.green || 0} green — adequate</div>
         </div>
 
         {/* Scorecard table */}
@@ -1593,7 +1779,7 @@ function ScorecardPage({ data, formData, onCalendly, onReset }) {
               <div className="col-span-3 font-serif-brand text-[1.15rem] font-semibold text-[#0F1C2C]">{r.coverage}</div>
               <div className="col-span-2 text-[.95rem] text-[#0F1C2C]/80">{r.limit}</div>
               <div className="col-span-1 text-center">
-                <span className={`inline-block px-3 py-1 rounded-full text-[.75rem] font-bold uppercase ${statusClass(r.status)}`}>
+                <span className={`inline-block px-3 py-1 text-[.72rem] font-bold uppercase tracking-wider ${statusClass(r.status)}`}>
                   {r.status}
                 </span>
               </div>
@@ -1736,7 +1922,7 @@ function QuizSidebar({ currentStep, answers, onJump }) {
 }
 
 function App() {
-  // High-level route: landing | quiz | gateA | snapshot | gateB | upload | processing | scorecard | calendly
+  // Routes: landing | quiz | gateA | snapshot | gateB | upload | contractUpload | processing | scorecard
   const [route, setRoute] = useState("landing");
   const [quizStep, setQuizStep] = useState(1);
   const [answers, setAnswers] = useState({
@@ -1750,6 +1936,7 @@ function App() {
   });
   const [formData, setFormData] = useState(null);
   const [uploadedFile, setUploadedFile] = useState("");
+  const [uploadMode, setUploadMode] = useState("policy"); // "policy" | "contract"
 
   const setA = (patch) => setAnswers(a => ({ ...a, ...patch }));
   const toggleArr = (key, v) =>
@@ -1761,6 +1948,7 @@ function App() {
     setAnswers({ industry: "", subVertical: "", size: "", headcount: "", workforceFlags: [], profileFlags: [], triggers: [] });
     setFormData(null);
     setUploadedFile("");
+    setUploadMode("policy");
   };
 
   const snapshot = useMemo(() => {
@@ -1782,12 +1970,16 @@ function App() {
 
   // ROUTES
   if (route === "landing") {
-    return <Landing onPickUpload={() => setRoute("gateB")} onPickQuiz={() => { setRoute("quiz"); setQuizStep(1); }} />;
+    return <Landing
+      onPickUpload={() => { setUploadMode("policy"); setRoute("gateB"); }}
+      onPickContract={() => { setUploadMode("contract"); setRoute("gateB"); }}
+      onPickQuiz={() => { setRoute("quiz"); setQuizStep(1); }}
+    />;
   }
 
   if (route === "quiz") {
     return (
-      <div className="min-h-screen vouch-mesh flex flex-col">
+      <div className="min-h-screen flex flex-col" style={{background:"#F0F1E5"}}>
         <VouchHeader
           onReset={reset}
           step={quizStep}
@@ -1859,13 +2051,23 @@ function App() {
   }
 
   if (route === "gateB") {
-    return <HubSpotGate ctx="B" onBack={() => setRoute("landing")} onSubmit={(d) => { setFormData(d); setRoute("upload"); }} />;
+    return <HubSpotGate ctx="B" onBack={() => setRoute("landing")}
+      onSubmit={(d) => { setFormData(d); setRoute(uploadMode === "contract" ? "contractUpload" : "upload"); }} />;
   }
 
   if (route === "upload") {
     return <UploadScreen
       onUploaded={(name) => { setUploadedFile(name); setRoute("processing"); }}
       onBack={() => setRoute(formData ? (snapshot ? "snapshot" : "gateB") : "landing")}
+      onReset={reset}
+      formData={formData}
+    />;
+  }
+
+  if (route === "contractUpload") {
+    return <ContractUploadScreen
+      onUploaded={(name) => { setUploadedFile(name); setRoute("processing"); }}
+      onBack={() => setRoute("gateB")}
       onReset={reset}
       formData={formData}
     />;
