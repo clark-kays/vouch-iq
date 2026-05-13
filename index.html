@@ -245,6 +245,135 @@
   .scrollable { overflow-y: auto; max-height: 100vh; }
   /* Yellow highlight for single-word emphasis in headlines */
   .hl-yellow { background: var(--vouch-yellow); padding: 0 .25em; border-radius: 3px; }
+
+  /* ── HubSpot v2 embed overrides — ID selector beats HubSpot's class styles ── */
+
+  /* Reset */
+  #hs-form-container form { margin: 0; padding: 0; }
+
+  /* Fieldsets */
+  #hs-form-container fieldset {
+    max-width: 100% !important;
+    border: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+    display: flex;
+    gap: 1rem;
+  }
+  #hs-form-container fieldset.form-columns-1 > div { width: 100%; }
+  #hs-form-container fieldset.form-columns-2 > div { flex: 1; min-width: 0; }
+
+  /* Field wrapper */
+  #hs-form-container .hs-form-field { width: 100%; }
+
+  /* Labels — uppercase Vouch style */
+  #hs-form-container .hs-form-field > label {
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #0D1B2A;
+    margin-bottom: .35rem;
+    display: block;
+  }
+  /* Required asterisk */
+  #hs-form-container .hs-form-required { color: #B91C1C; }
+
+  /* Inputs */
+  #hs-form-container input.hs-input,
+  #hs-form-container select.hs-input,
+  #hs-form-container textarea.hs-input {
+    width: 100% !important;
+    padding: .85rem 1rem;
+    border: 1.5px solid #D8D9CC;
+    border-radius: 3px;
+    font-size: .98rem;
+    background: #F7F8F2;
+    color: #0D1B2A;
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    box-shadow: none;
+    box-sizing: border-box;
+  }
+  #hs-form-container input.hs-input:focus,
+  #hs-form-container select.hs-input:focus,
+  #hs-form-container textarea.hs-input:focus {
+    outline: none;
+    border-color: #0D1B2A;
+    background: #fff;
+  }
+
+  /* Phone field — country picker + input sit side by side */
+  #hs-form-container .hs-input.hs-fieldtype-intl-phone { display: flex; gap: .5rem; }
+  #hs-form-container .hs-input.hs-fieldtype-intl-phone select { width: auto; flex-shrink: 0; }
+  #hs-form-container .hs-input.hs-fieldtype-intl-phone input { flex: 1; }
+
+  /* Input wrapper */
+  #hs-form-container .input { margin: 0; }
+
+  /* Submit button */
+  #hs-form-container input[type="submit"],
+  #hs-form-container .hs-button {
+    padding: .78rem 2.1rem;
+    background: #3BE0AD;
+    color: #0D1B2A;
+    border: none;
+    border-radius: 3px;
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: filter .15s ease;
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: .5rem;
+  }
+  #hs-form-container input[type="submit"]:hover,
+  #hs-form-container .hs-button:hover { filter: brightness(0.92); }
+
+  /* Actions row */
+  #hs-form-container .actions { padding: 0; }
+
+  /* Error messages */
+  #hs-form-container .hs-error-msgs { list-style: none; padding: 0; margin: .3rem 0 0; }
+  #hs-form-container .hs-error-msg { color: #B91C1C; font-size: .82rem; font-family: 'Inter', Arial, sans-serif; }
+
+  /* Consent */
+  #hs-form-container .legal-consent-container { margin-top: .75rem; }
+  #hs-form-container .hs-form-booleancheckbox-display {
+    display: flex;
+    align-items: flex-start;
+    gap: .65rem;
+  }
+  #hs-form-container .hs-form-booleancheckbox-display > span {
+    font-size: .85rem;
+    font-weight: 400;
+    color: rgba(13,27,42,.8);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  #hs-form-container input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    min-width: 1rem;
+    margin-top: .15rem;
+    flex-shrink: 0;
+    accent-color: #0D1B2A;
+    cursor: pointer;
+  }
+
+  /* Richtext / field description */
+  #hs-form-container .hs-richtext,
+  #hs-form-container .hs-field-desc {
+    font-size: .8rem;
+    color: #6b7280;
+    font-family: 'Inter', Arial, sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
 </style>
 </head>
 <body>
@@ -1294,23 +1423,13 @@ function Q6Triggers({ industry, values, onToggle, onNext, onBack }) {
 }
 
 // ============================================================
-//  HUBSPOT FORM GATE (mocked)
+//  HUBSPOT FORM GATE — native form, background API submission
+//  Renders our own styled fields. On submit, immediately calls
+//  onSubmit() to advance the React route, then fires a background
+//  POST to HubSpot's Forms API so the lead is still captured.
+//  HubSpot never touches the DOM, so its success screen never shows.
 // ============================================================
 function HubSpotGate({ onSubmit, onBack, ctx }) {
-  const [form, setForm] = useState({
-    firstName: "", lastName: "", email: "", company: "", role: "", phone: "", consent: false,
-  });
-  const [touched, setTouched] = useState(false);
-  const valid =
-    form.firstName.trim() &&
-    form.lastName.trim() &&
-    /\S+@\S+\.\S+/.test(form.email) &&
-    form.company.trim() &&
-    form.role.trim() &&
-    form.consent;
-
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-
   const headline =
     ctx === "B"
       ? "Almost there. Tell us where to send your full policy analysis."
@@ -1319,6 +1438,75 @@ function HubSpotGate({ onSubmit, onBack, ctx }) {
     ctx === "B"
       ? "We'll email a copy and route your scorecard to a sub-vertical specialist."
       : "We'll email a copy of your snapshot and unlock the full results below.";
+
+  const [fields, setFields] = useState({
+    firstName: "", lastName: "", email: "", company: "", jobtitle: "", phone: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+
+  function setField(name, value) {
+    setFields(f => ({ ...f, [name]: value }));
+    setErrors(e => ({ ...e, [name]: "" }));
+  }
+
+  function validate() {
+    const e = {};
+    if (!fields.firstName.trim()) e.firstName = "Required";
+    if (!fields.lastName.trim())  e.lastName  = "Required";
+    if (!fields.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email))
+      e.email = "Valid email required";
+    if (!fields.company.trim()) e.company = "Required";
+    return e;
+  }
+
+  function handleSubmit(evt) {
+    evt.preventDefault();
+    const e = validate();
+    if (Object.keys(e).length) { setErrors(e); return; }
+    setSubmitting(true);
+
+    // Fire HubSpot Forms API in the background — lead captured regardless of result
+    const hsPayload = {
+      fields: [
+        { name: "firstname", value: fields.firstName },
+        { name: "lastname",  value: fields.lastName  },
+        { name: "email",     value: fields.email      },
+        { name: "company",   value: fields.company    },
+        { name: "jobtitle",  value: fields.jobtitle   },
+        { name: "phone",     value: fields.phone       },
+      ],
+      context: { pageUri: window.location.href, pageName: "Coverage Intelligence Tool" },
+    };
+    fetch(
+      "https://api.hsforms.com/submissions/v3/integration/submit/43573872/ab5c9ed4-d58c-4a60-a634-ca54020109c9",
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(hsPayload) }
+    ).catch(() => {}); // fire-and-forget
+
+    // Advance React route immediately — don't wait for the network
+    onSubmit({
+      firstName: fields.firstName,
+      lastName:  fields.lastName,
+      email:     fields.email,
+      company:   fields.company,
+      role:      fields.jobtitle,
+      phone:     fields.phone,
+      consent:   true,
+    });
+  }
+
+  const iS = (name) => ({
+    width: "100%", padding: ".85rem 1rem",
+    border: `1.5px solid ${errors[name] ? "#B91C1C" : "var(--vouch-light-gray)"}`, borderRadius: "3px",
+    fontSize: ".98rem", background: "var(--vouch-mint-cream)", color: "var(--vouch-dark)",
+    fontFamily: "inherit", boxSizing: "border-box",
+  });
+  const lS = {
+    fontSize: ".8rem", fontWeight: 600, letterSpacing: ".04em",
+    textTransform: "uppercase", color: "var(--vouch-dark)",
+    marginBottom: ".35rem", display: "block",
+  };
+  const eS = { color: "#B91C1C", fontSize: ".82rem", marginTop: ".25rem" };
 
   return (
     <div className="min-h-screen" style={{background:"#F0F1E5"}}>
@@ -1332,50 +1520,54 @@ function HubSpotGate({ onSubmit, onBack, ctx }) {
         <p className="mt-3 text-[1.02rem] text-[#0F1C2C]/70">{subhead}</p>
 
         <div className="card-elevated mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="label">First name *</label>
-              <input className="input-base" value={form.firstName} onChange={e => set("firstName", e.target.value)} />
+          <form onSubmit={handleSubmit} noValidate>
+            <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem", marginBottom:"1rem"}}>
+              <div>
+                <label style={lS}>First name <span style={{color:"#B91C1C"}}>*</span></label>
+                <input type="text" value={fields.firstName} onChange={e => setField("firstName", e.target.value)} style={iS("firstName")} autoComplete="given-name" />
+                {errors.firstName && <p style={eS}>{errors.firstName}</p>}
+              </div>
+              <div>
+                <label style={lS}>Last name <span style={{color:"#B91C1C"}}>*</span></label>
+                <input type="text" value={fields.lastName} onChange={e => setField("lastName", e.target.value)} style={iS("lastName")} autoComplete="family-name" />
+                {errors.lastName && <p style={eS}>{errors.lastName}</p>}
+              </div>
             </div>
-            <div>
-              <label className="label">Last name *</label>
-              <input className="input-base" value={form.lastName} onChange={e => set("lastName", e.target.value)} />
+            <div style={{marginBottom:"1rem"}}>
+              <label style={lS}>Work email <span style={{color:"#B91C1C"}}>*</span></label>
+              <input type="email" value={fields.email} onChange={e => setField("email", e.target.value)} style={iS("email")} autoComplete="email" />
+              {errors.email && <p style={eS}>{errors.email}</p>}
             </div>
-            <div className="md:col-span-2">
-              <label className="label">Work email *</label>
-              <input type="email" className="input-base" value={form.email} onChange={e => set("email", e.target.value)} />
+            <div style={{marginBottom:"1rem"}}>
+              <label style={lS}>Company <span style={{color:"#B91C1C"}}>*</span></label>
+              <input type="text" value={fields.company} onChange={e => setField("company", e.target.value)} style={iS("company")} autoComplete="organization" />
+              {errors.company && <p style={eS}>{errors.company}</p>}
             </div>
-            <div>
-              <label className="label">Company *</label>
-              <input className="input-base" value={form.company} onChange={e => set("company", e.target.value)} />
+            <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem", marginBottom:"1.5rem"}}>
+              <div>
+                <label style={lS}>Job title</label>
+                <input type="text" value={fields.jobtitle} onChange={e => setField("jobtitle", e.target.value)} style={iS("jobtitle")} autoComplete="organization-title" />
+              </div>
+              <div>
+                <label style={lS}>Phone</label>
+                <input type="tel" value={fields.phone} onChange={e => setField("phone", e.target.value)} style={iS("phone")} autoComplete="tel" />
+              </div>
             </div>
-            <div>
-              <label className="label">Role / title *</label>
-              <input className="input-base" value={form.role} onChange={e => set("role", e.target.value)} />
-            </div>
-            <div className="md:col-span-2">
-              <label className="label">Phone <span className="text-[#A8A8A8] font-normal normal-case tracking-normal">(optional)</span></label>
-              <input className="input-base" value={form.phone} onChange={e => set("phone", e.target.value)} />
-            </div>
-            <label className="md:col-span-2 flex items-start gap-3 mt-2 cursor-pointer">
-              <input type="checkbox" className="mt-1.5 w-4 h-4 accent-[#0F1C2C]" checked={form.consent} onChange={e => set("consent", e.target.checked)} />
-              <span className="text-[.85rem] text-[#0F1C2C]/80">
-                I agree to receive my results plus occasional Vouch updates. You can unsubscribe any time. We comply with CAN-SPAM, GDPR, and CCPA.
-              </span>
-            </label>
-          </div>
-          {touched && !valid && (
-            <div className="mt-4 text-sm text-[#B91C1C]">Please fill in all required fields and accept the consent checkbox.</div>
-          )}
-          <div className="mt-7 flex items-center justify-between gap-3">
-            <button className="cta-link" onClick={onBack}>← Back</button>
-            <button className="cta-primary" onClick={() => { setTouched(true); if (valid) onSubmit(form); }}>
-              Unlock my results →
+            <button
+              type="submit"
+              className="cta-primary-wide"
+              disabled={submitting}
+            >
+              {submitting ? "Loading..." : ctx === "B" ? "GET MY FULL ANALYSIS →" : "VIEW MY COVERAGE SNAPSHOT →"}
             </button>
-          </div>
+            <p style={{fontSize:".78rem", color:"rgba(13,27,42,.5)", marginTop:".75rem", lineHeight:1.5}}>
+              By submitting, you agree to receive communications from Vouch. We respect your privacy.
+            </p>
+          </form>
         </div>
-        <div className="mt-6 text-[.7rem] text-[#A8A8A8]">
-          Prototype: form is mocked — no real HubSpot or Salesforce write happens here.
+
+        <div className="mt-6 flex items-center gap-3">
+          <button className="cta-link" onClick={onBack}>← Back</button>
         </div>
       </div>
     </div>
